@@ -6,6 +6,10 @@
 #include <Referee.h>
 #include <CRC.h>
 
+#include <rm_interfaces/msg/game_robot_hp.hpp>
+#include <rm_interfaces/msg/power_heat_data.hpp>
+#include <rm_interfaces/msg/shoot_data.hpp>
+
 typedef struct __packed
 {
   uint8_t sof;
@@ -46,7 +50,9 @@ private:
 
     FrameBuffer header_receive_buffer_;
     // Publishers
-    rclcpp::Publisher<>
+    rclcpp::Publisher<rm_interfaces::msg::GameRobotHP>::SharedPtr game_robot_hp_pub_;
+    rclcpp::Publisher<rm_interfaces::msg::PowerHeatData>::SharedPtr power_heat_data_pub_;
+    rclcpp::Publisher<rm_interfaces::msg::ShootData>::SharedPtr shoot_data_pub_;
 
     int SOF_ = 0xA5;
     int TOF_ = 0xA6;

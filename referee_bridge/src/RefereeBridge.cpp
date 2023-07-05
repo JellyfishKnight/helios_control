@@ -12,7 +12,9 @@ RefereeBridge::RefereeBridge(const rclcpp::NodeOptions& options) : Node("referee
 }
 
 void RefereeBridge::RegisterTopics() {
-    
+    game_robot_hp_pub_ = this->create_publisher<rm_interfaces::msg::GameRobotHP>("game_robot_hp", rclcpp::SensorDataQoS());
+    power_heat_data_pub_ = this->create_publisher<rm_interfaces::msg::PowerHeatData>("power_heat_data", rclcpp::SensorDataQoS());
+    shoot_data_pub_ = this->create_publisher<rm_interfaces::msg::ShootData>("shoot_data", rclcpp::SensorDataQoS());
 }
 
 void RefereeBridge::InitSerial() {
