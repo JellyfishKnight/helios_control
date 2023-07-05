@@ -13,8 +13,27 @@ find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/ReceiveData.msg"
-  "msg/SendData.msg"
+  "msg/IMU/IMUReceive.msg"
+  "msg/IMU/IMUSend.msg"
+  "msg/Referee/AerialRobotEnergy.msg"
+  "msg/Referee/BuffMusk.msg"
+  "msg/Referee/BulletRemaining.msg"
+  "msg/Referee/DartClientCmd.msg"
+  "msg/Referee/DartRemainingTime.msg"
+  "msg/Referee/DartStatus.msg"
+  "msg/Referee/EventData.msg"
+  "msg/Referee/GameResult.msg"
+  "msg/Referee/GameRobotHP.msg"
+  "msg/Referee/GameRobotPos.msg"
+  "msg/Referee/GameRobotState.msg"
+  "msg/Referee/GameState.msg"
+  "msg/Referee/JudgeSystemData.msg"
+  "msg/Referee/PowerHeatData.msg"
+  "msg/Referee/RefereeWarning.msg"
+  "msg/Referee/RFIDStatus.msg"
+  "msg/Referee/RobotHurt.msg"
+  "msg/Referee/ShootData.msg"
+  "msg/Referee/SupplyProjectileAction.msg"
   DEPENDENCIES
     std_msgs
     geometry_msgs

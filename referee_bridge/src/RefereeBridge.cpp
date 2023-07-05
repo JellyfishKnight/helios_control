@@ -48,14 +48,6 @@ void RefereeBridge::DelcareParams() {
     this->declare_parameter("serial_port_timeout", 1000);
 }
 
-void RefereeBridge::Unpack() {
-
-}
-
-void RefereeBridge::PublishMsgs() {
-
-}
-
 void RefereeBridge::ProcessFuntion() {
     while (rclcpp::ok()) {
         if (!serial_port_.isOpen()) {
@@ -68,10 +60,23 @@ void RefereeBridge::ProcessFuntion() {
         if (serial_port_.read(pdata, 1) == 1 && pdata[0] == 0xa5)
         {
             try {
-                
-            } catch () {
-
+                serial_port_.read((uint8_t *)&header_receive_buffer_.data_length, 6);
+                if (header_receive_buffer_.data_length > 256)
+                {
+                    RCLCPP_ERROR(this->get_logger(), "data length error");
+                    continue;
+                }
+                serial_port_.read(header_receive_buffer_.data, header_receive_buffer_.data_length + 2);
+                if (header_receive_buffer_.CheckTail() != 0xa6a7 && !header_receive_buffer_.CheckPackCRC16())
+                {
+                    RCLCPP_WARN(this->get_logger(), "check cmd id %x tail failed %x", header_receive_buffer_.cmd_id, header_receive_buffer_.CheckTail());
+                    continue;
+                }
+            } catch (serial::SerialException& exception) {
+                RCLCPP_ERROR(this->get_logger(), "serial port read error: %s", exception.what());
+                continue;
             }
+            
             
         }
 }

@@ -44,9 +44,9 @@ private:
     int serial_port_baudrate_;
     int serial_port_timeout_;
 
-    // double time_serial_cost_;
-    // double time_serial_start_;
-    // double last_time_serial_stamp_;
+    FrameBuffer header_receive_buffer_;
+    // Publishers
+    rclcpp::Publisher<>
 
     int SOF_ = 0xA5;
     int TOF_ = 0xA6;
@@ -54,10 +54,6 @@ private:
     void InitSerial();
 
     void DelcareParams();  
-
-    void Unpack();
-
-    void PublishMsgs();
 
     void ProcessFuntion();
 

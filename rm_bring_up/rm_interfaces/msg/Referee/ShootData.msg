@@ -1,4 +1,4 @@
 uint8 bullet_type
 uint8 shooter_id
 uint8 bullet_freq
-float bullet_speed
+float32 bullet_speed
