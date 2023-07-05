@@ -1,0 +1,1 @@
+uint8 attack_time

@@ -1,0 +1,2 @@
+uint8 dart_belong
+uint16 stage_remain_time
