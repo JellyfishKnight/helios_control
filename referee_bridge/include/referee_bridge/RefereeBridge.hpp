@@ -12,32 +12,34 @@
 
 typedef struct __packed
 {
-  uint8_t sof;
-  uint16_t data_length;
-  uint8_t seq;
-  uint8_t crc8;
-  uint16_t cmd_id;
-  uint8_t data[256]{};
-  bool CheckHeaderCRC8()
-  {
-    return Verify_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
-  }
-  bool CheckPackCRC16()
-  {
-    return Verify_CRC16_Check_Sum((uint8_t *)this, GetLength());
-  }
-  uint16_t CheckTail()
-  {
-    uint16_t tail = *(uint16_t *)((uint8_t *)this + GetLength() - 2);
-    return tail;
-  }
-  void AddCRC()
-  {
-    Append_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
-    Append_CRC16_Check_Sum((uint8_t *)this, GetLength());
-  }
-  size_t GetHeaderLength() { return 5; }
-  size_t GetLength() { return 7 + data_length + 2; }
+    uint8_t sof;
+    uint16_t data_length;
+    uint8_t seq;
+    uint8_t crc8;
+    uint16_t cmd_id;
+    uint8_t data[256]{};
+    bool CheckHeaderCRC8()
+    {
+      return Verify_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
+    }
+    bool CheckPackCRC16()
+    {
+      return Verify_CRC16_Check_Sum((uint8_t *)this, GetLength());
+    }
+    uint16_t CheckTail()
+    {
+      uint16_t tail = *(uint16_t *)((uint8_t *)this + GetLength() - 2);
+      return tail;
+    }
+    void AddCRC()
+    {
+      Append_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
+      Append_CRC16_Check_Sum((uint8_t *)this, GetLength());
+    }
+    size_t GetHeaderLength() { return 5; }
+    size_t GetLength() { return 7 + data_length + 2; }
+
+    
 } FrameBuffer;
 
 

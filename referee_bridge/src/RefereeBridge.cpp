@@ -78,8 +78,22 @@ void RefereeBridge::ProcessFuntion() {
                 RCLCPP_ERROR(this->get_logger(), "serial port read error: %s", exception.what());
                 continue;
             }
-            
-            
+            uint16_t command_id = header_receive_buffer_.cmd_id;
+            switch (command_id)
+            {
+            // robot_hp
+            case 0x003:
+                rm_interfaces::msg::GameRobotHP game_robot_hp;
+                
+                break;
+            // shoot_data
+            case 0X201:
+                break;
+            // power_heat_data
+            case 0x202:
+                break;
+            default:
+                break;
+            }
         }
 }
-
