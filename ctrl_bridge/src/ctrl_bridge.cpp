@@ -13,10 +13,10 @@ CtrlBridge::CtrlBridge(const rclcpp::NodeOptions& options) : Node("ctrl_bridge",
   send_data_.SOF = (0xA5);
   send_data_.TOF = (0xA6);
   
-  serial_pub_ = this->create_publisher<rm_interfaces::msg::ReceiveData>("serial_data", rclcpp::SensorDataQoS());
+  serial_pub_ = this->create_publisher<rm_interfaces::msg::IMUReceive>("serial_data", rclcpp::SensorDataQoS());
   
   // 创建一个订阅者订阅话题
-  cmd_vel_sub_ = this->create_subscription<rm_interfaces::msg::SendData>(cmd_vel_topic.c_str(), // 配置后面移植，先硬编代替
+  cmd_vel_sub_ = this->create_subscription<rm_interfaces::msg::IMUSend>(cmd_vel_topic.c_str(), // 配置后面移植，先硬编代替
                                                                       rclcpp::SystemDefaultsQoS(),
                                                                       std::bind(&CtrlBridge::cmd_vel_callback,
                                                                                 this,
@@ -75,7 +75,7 @@ void CtrlBridge::process_receive() {           // 数据处理过程
       // todo overflow
       if (time_serial_cost_ / 10e6 < 0.5) {
         auto stamp = this->now();
-        rm_interfaces::msg::ReceiveData data_buffer;
+        rm_interfaces::msg::IMUReceive data_buffer;
         data_buffer.header.stamp = stamp;
         data_buffer.header.frame_id = "middle_virtual_joint";
         // std::memcpy(&data_buffer, pdata + 1, 14);
@@ -159,7 +159,7 @@ CtrlBridge::~CtrlBridge()
 /**
  * @brief 收到话题数据的回调函数
  * */
-void CtrlBridge::cmd_vel_callback(const rm_interfaces::msg::SendData cmd_vel)
+void CtrlBridge::cmd_vel_callback(const rm_interfaces::msg::IMUSend cmd_vel)
 {
   send_data_.cmd_ = cmd_vel.cmd;
   send_data_.find_ = cmd_vel.find;

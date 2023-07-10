@@ -11,8 +11,8 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-#include "rm_interfaces/msg/receive_data.hpp"
-#include "rm_interfaces/msg/send_data.hpp"
+#include "rm_interfaces/msg/imu_receive.hpp"
+#include "rm_interfaces/msg/imu_send.hpp"
 
 #include "chrono"
 #include "thread"
@@ -99,7 +99,7 @@ private:
     /**
      * @brief 接受器的回调函数
     */
-    void cmd_vel_callback(const rm_interfaces::msg::SendData cmd_vel);
+    void cmd_vel_callback(const rm_interfaces::msg::IMUSend cmd_vel);
     /**
      * @brief 发送从串口读取的数据
     */
@@ -114,8 +114,8 @@ private:
     //  topic name
     std::string cmd_vel_topic = "/cmd_vel";
     //  cmd_vel Subscription
-    rclcpp::Subscription<rm_interfaces::msg::SendData>::SharedPtr cmd_vel_sub_;
-    rclcpp::Publisher<rm_interfaces::msg::ReceiveData>::SharedPtr serial_pub_;
+    rclcpp::Subscription<rm_interfaces::msg::IMUSend>::SharedPtr cmd_vel_sub_;
+    rclcpp::Publisher<rm_interfaces::msg::IMUReceive>::SharedPtr serial_pub_;
     //  data_struct
     ReceiveData receive_data_;
     SendData send_data_;
