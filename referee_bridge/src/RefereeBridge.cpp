@@ -1,99 +1,51 @@
 #include "RefereeBridge.hpp"
 
-
-RefereeBridge::RefereeBridge(const rclcpp::NodeOptions& options) : Node("referee_bridge", options) {
-    DelcareParams();
-    RegisterTopics();
-    InitSerial();
-    std::thread([this]() {
-        RCLCPP_INFO(this->get_logger(),"thread start");
-        this->ProcessFuntion(); 
-    }).detach();
-}
-
-void RefereeBridge::RegisterTopics() {
-    game_robot_hp_pub_ = this->create_publisher<rm_interfaces::msg::GameRobotHP>("game_robot_hp", rclcpp::SensorDataQoS());
-    power_heat_data_pub_ = this->create_publisher<rm_interfaces::msg::PowerHeatData>("power_heat_data", rclcpp::SensorDataQoS());
-    shoot_data_pub_ = this->create_publisher<rm_interfaces::msg::ShootData>("shoot_data", rclcpp::SensorDataQoS());
-}
-
-void RefereeBridge::InitSerial() {
-    serial_port_name_ = this->get_parameter("serial_port_name").as_string();
-    serial_port_baudrate_ = this->get_parameter("serial_port_baudrate").as_int();
-    serial_port_timeout_ = this->get_parameter("serial_port_timeout").as_int();
-    try {
-        RCLCPP_INFO(this->get_logger(), "serial_port:[%s]", serial_port_name_.c_str());
-        serial_port_.setPort(serial_port_name_);
-        serial_port_.setBaudrate(serial_port_baudrate_);
-        serial_port_.setFlowcontrol(serial::flowcontrol_none);
-        serial_port_.setParity(serial::parity_none); // default is parity_none
-        serial_port_.setStopbits(serial::stopbits_one);
-        serial_port_.setBytesize(serial::eightbits);
-        serial::Timeout time_out = serial::Timeout::simpleTimeout(serial_port_timeout_);
-        serial_port_.setTimeout(time_out);
-        serial_port_.open();
-    } catch (serial::IOException &e) {
-        RCLCPP_ERROR(this->get_logger(), "Unable to open port: %s", e.what());
-        exit(0);
-    }
-    if (serial_port_.isOpen()) {
-        RCLCPP_INFO(this->get_logger(), "Serial Port initialized");
-    } else {
-        RCLCPP_ERROR(this->get_logger(), "Unable to initial Serial port ");
-        exit(0);
-    }
-}
-
-void RefereeBridge::DelcareParams() {
-    this->declare_parameter("serial_port_name", "/dev/ttyUSB1");
-    this->declare_parameter("serial_port_baudrate", 115200);
-    this->declare_parameter("serial_port_timeout", 1000);
-}
-
-void RefereeBridge::ProcessFuntion() {
-    while (rclcpp::ok()) {
-        if (!serial_port_.isOpen()) {
-            RCLCPP_ERROR(this->get_logger(), "serial port is not open");
-            rclcpp::shutdown();
-            exit(0);
+namespace helios_control {
+    hardware_interface::CallbackReturn RefereeBridge::on_init(const hardware_interface::HardwareInfo & info) {
+        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "on_init");
+        if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
+            return hardware_interface::CallbackReturn::ERROR;
         }
-        // check head start   检查起始 数据帧头
-        uint8_t pdata[16] = {0x00};
-        if (serial_port_.read(pdata, 1) == 1 && pdata[0] == 0xa5)
-        {
-            try {
-                serial_port_.read((uint8_t *)&header_receive_buffer_.data_length, 6);
-                if (header_receive_buffer_.data_length > 256)
-                {
-                    RCLCPP_ERROR(this->get_logger(), "data length error");
-                    continue;
-                }
-                serial_port_.read(header_receive_buffer_.data, header_receive_buffer_.data_length + 2);
-                if (header_receive_buffer_.CheckTail() != 0xa6a7 && !header_receive_buffer_.CheckPackCRC16())
-                {
-                    RCLCPP_WARN(this->get_logger(), "check cmd id %x tail failed %x", header_receive_buffer_.cmd_id, header_receive_buffer_.CheckTail());
-                    continue;
-                }
-            } catch (serial::SerialException& exception) {
-                RCLCPP_ERROR(this->get_logger(), "serial port read error: %s", exception.what());
-                continue;
-            }
-            uint16_t command_id = header_receive_buffer_.cmd_id;
-            switch (command_id)
-            {
-            // robot_hp
-            case 0x003:
-                rm_interfaces::msg::GameRobotHP game_robot_hp;
-                
-                break;
-            // shoot_data
-            case 0X201:
-                break;
-            // power_heat_data
-            case 0x202:
-                break;
-            default:
-                break;
-            }
-        }
-}
+        serial_port_ = std::make_unique<serial::Serial>();
+        header_receive_buffer_ = std::make_unique<FrameBuffer>();
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
+    hardware_interface::CallbackReturn RefereeBridge::on_configure(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "on_configure");
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
+    std::vector<hardware_interface::StateInterface> RefereeBridge::export_state_interfaces() {
+        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "export_state_interfaces");
+        return std::vector<hardware_interface::StateInterface>();
+    }
+
+    std::vector<hardware_interface::CommandInterface> RefereeBridge::export_command_interfaces() {
+        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "export_command_interfaces");
+        return std::vector<hardware_interface::CommandInterface>();
+    }
+
+    hardware_interface::CallbackReturn RefereeBridge::on_activate(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "on_activate");
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
+    hardware_interface::CallbackReturn RefereeBridge::on_deactivate(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "on_deactivate");
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
+    hardware_interface::return_type RefereeBridge::read(const rclcpp::Time & , const rclcpp::Duration & )
+    {
+
+        return hardware_interface::return_type::OK;
+    }
+
+    hardware_interface::return_type RefereeBridge::write(const rclcpp::Time & , const rclcpp::Duration & )
+    {
+
+        return hardware_interface::return_type::OK;
+    }
+
+} // namespace helios_control

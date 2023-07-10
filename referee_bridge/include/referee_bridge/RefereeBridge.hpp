@@ -3,6 +3,15 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <serial/serial.h>
+#include "hardware_interface/system_interface.hpp"
+#include "hardware_interface/types/hardware_interface_return_values.hpp"
+#include "rclcpp/macros.hpp"
+#include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
+#include "rclcpp_lifecycle/state.hpp"
+#include "visibility_control.h"
+
+
+
 #include <Referee.h>
 #include <CRC.h>
 
@@ -10,66 +19,59 @@
 #include <rm_interfaces/msg/power_heat_data.hpp>
 #include <rm_interfaces/msg/shoot_data.hpp>
 
-typedef struct __packed
-{
-    uint8_t sof;
-    uint16_t data_length;
-    uint8_t seq;
-    uint8_t crc8;
-    uint16_t cmd_id;
-    uint8_t data[256]{};
-    bool CheckHeaderCRC8()
-    {
-      return Verify_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
-    }
-    bool CheckPackCRC16()
-    {
-      return Verify_CRC16_Check_Sum((uint8_t *)this, GetLength());
-    }
-    uint16_t CheckTail()
-    {
-      uint16_t tail = *(uint16_t *)((uint8_t *)this + GetLength() - 2);
-      return tail;
-    }
-    void AddCRC()
-    {
-      Append_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
-      Append_CRC16_Check_Sum((uint8_t *)this, GetLength());
-    }
-    size_t GetHeaderLength() { return 5; }
-    size_t GetLength() { return 7 + data_length + 2; }
+namespace helios_control {
 
-    
-} FrameBuffer;
+class RefereeBridge : public hardware_interface::SystemInterface {
+public:
+    RCLCPP_SHARED_PTR_DEFINITIONS(RefereeBridge);
 
+    REFEREE_PUBLIC
+    hardware_interface::CallbackReturn on_init(
+      const hardware_interface::HardwareInfo & info) override;
 
-class RefereeBridge : public rclcpp::Node {
-private:
-    serial::Serial serial_port_;
+    REFEREE_PUBLIC
+    hardware_interface::CallbackReturn on_configure(
+      const rclcpp_lifecycle::State & previous_state) override;
+
+    REFEREE_PUBLIC
+    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+
+    REFEREE_PUBLIC
+    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+
+    REFEREE_PUBLIC
+    hardware_interface::CallbackReturn on_activate(
+      const rclcpp_lifecycle::State & previous_state) override;
+
+    REFEREE_PUBLIC
+    hardware_interface::CallbackReturn on_deactivate(
+      const rclcpp_lifecycle::State & previous_state) override;
+
+    REFEREE_PUBLIC
+    hardware_interface::return_type read(
+      const rclcpp::Time & time, const rclcpp::Duration & period) override;
+
+    REFEREE_PUBLIC
+    hardware_interface::return_type write(
+      const rclcpp::Time & time, const rclcpp::Duration & period) override;
+
+    RefereeBridge(const rclcpp::NodeOptions& options);
+
+    ~RefereeBridge() = default;
+
+private: 
+    std::unique_ptr<serial::Serial> serial_port_;
     std::string serial_port_name_;
     int serial_port_baudrate_;
     int serial_port_timeout_;
 
-    FrameBuffer header_receive_buffer_;
-    // Publishers
-    rclcpp::Publisher<rm_interfaces::msg::GameRobotHP>::SharedPtr game_robot_hp_pub_;
-    rclcpp::Publisher<rm_interfaces::msg::PowerHeatData>::SharedPtr power_heat_data_pub_;
-    rclcpp::Publisher<rm_interfaces::msg::ShootData>::SharedPtr shoot_data_pub_;
+    std::unique_ptr<FrameBuffer> header_receive_buffer_;
 
     int SOF_ = 0xA5;
     int TOF_ = 0xA6;
 
-    void InitSerial();
-
-    void DelcareParams();  
-
-    void ProcessFuntion();
-
-    void RegisterTopics();
-public:
-    RefereeBridge(const rclcpp::NodeOptions& options);
-    ~RefereeBridge() = default;
 };
 
+} // namespace helios_control
 
 #endif

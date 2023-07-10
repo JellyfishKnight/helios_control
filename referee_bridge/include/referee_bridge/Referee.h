@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdbool.h>
 #include <stdint.h>
+#include <CRC.h>
 #define __packed __attribute__((__packed__))
 /** 移植：胡廷文
   * 注解：裁判系统中，所有结构体使用__packed关键字进行字节对齐
@@ -274,7 +275,7 @@ typedef  struct __packed
  uint16_t operate_launch_cmd_time;
 }ext_dart_client_cmd_t;
 
-typedef struct 
+typedef struct __packed
 {
 	ext_game_robot_HP_t                  RoboHP;                  //0x0003 机器人血量   *****
 	ext_supply_projectile_action_t		   SupplyProjectileAction;	//0x0102 补给站       *****
@@ -288,6 +289,36 @@ typedef struct
 	float														 SuperCapRemain;					//超级电容剩余量
 
 }ext_judge_system_data;
+
+typedef struct __packed
+{
+    uint8_t sof;
+    uint16_t data_length;
+    uint8_t seq;
+    uint8_t crc8;
+    uint16_t cmd_id;
+    uint8_t data[256]{};
+    bool CheckHeaderCRC8() {
+      return Verify_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
+    }
+    bool CheckPackCRC16()
+    {
+      return Verify_CRC16_Check_Sum((uint8_t *)this, GetLength());
+    }
+    uint16_t CheckTail()
+    {
+      uint16_t tail = *(uint16_t *)((uint8_t *)this + GetLength() - 2);
+      return tail;
+    }
+    void AddCRC()
+    {
+      Append_CRC8_Check_Sum((uint8_t *)this, GetHeaderLength());
+      Append_CRC16_Check_Sum((uint8_t *)this, GetLength());
+    }
+    size_t GetHeaderLength() { return 5; }
+    size_t GetLength() { return 7 + data_length + 2; }
+} FrameBuffer;
+
 
 /*****************系统数据定义**********************/
 extern ext_judge_system_data judge_system_data;
