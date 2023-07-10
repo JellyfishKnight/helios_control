@@ -1,0 +1,3 @@
+[submodule "armor_autoaim"]
+	path = armor_autoaim
+	url = https://github.com/JellyfishKnight/armor_autoaim.git
