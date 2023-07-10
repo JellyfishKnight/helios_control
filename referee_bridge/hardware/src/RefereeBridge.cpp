@@ -48,10 +48,10 @@ namespace helios_control {
            info_.sensors[0].name, "referee_bridge", game_robot_hp_.data()
         ));
         state_interfaces.emplace_back(hardware_interface::StateInterface(
-           info_.sensors[1].name, "referee_bridge", power_heat_data_.data()
+           info_.sensors[1].name, "referee_bridge", power_heat_.data()
         ));
         state_interfaces.emplace_back(hardware_interface::StateInterface(
-           info_.sensors[2].name, "referee_bridge", shoot_data_.data()
+           info_.sensors[2].name, "referee_bridge", shoot_.data()
         ));
         return state_interfaces;
     }
@@ -146,15 +146,48 @@ namespace helios_control {
     }
 
     void RefereeBridge::GameRobotHPCallback(uint8_t * data, uint16_t data_length) {
-
+        std::memcpy(&game_robot_hp_data_, 
+        (header_receive_buffer_->data + header_receive_buffer_->GetHeaderLength()),
+        LEN_game_robot_HP);
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_1_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_2_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_3_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_4_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_5_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_7_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_outpost_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.red_base_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_1_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_2_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_3_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_4_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_5_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_7_robot_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_outpost_HP));
+        game_robot_hp_.emplace_back(static_cast<double>(game_robot_hp_data_.blue_base_HP));
     }
 
     void RefereeBridge::PowerHeatDataCallback(uint8_t * data, uint16_t data_length) {
-
+        std::memcpy(&power_heat_data_, 
+        (header_receive_buffer_->data + header_receive_buffer_->GetHeaderLength()),
+        LEN_power_heat_data);
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_volt));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_current));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_power));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_power_buffer));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.shooter_id1_17mm_cooling_heat));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.shooter_id2_17mm_cooling_heat));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.shooter_id1_42mm_cooling_heat));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.shooter_id1_17mm_residual_cooling_heat));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.shooter_id2_17mm_residual_cooling_heat));
+        power_heat_.emplace_back(static_cast<double>(power_heat_data_.shooter_id1_42mm_residual_cooling_heat));
     }
 
     void RefereeBridge::ShootDataCallback(uint8_t * data, uint16_t data_length) {
-
+        std::memcpy(&shoot_data_, 
+        (header_receive_buffer_->data + header_receive_buffer_->GetHeaderLength()),
+        LEN_shoot_data);
+        shoot_.emplace_back(static_cast<double>(shoot_data_.bullet_speed));
     }
 
 

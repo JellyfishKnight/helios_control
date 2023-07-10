@@ -62,10 +62,6 @@ public:
     REFEREE_PUBLIC
     hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
-    RefereeBridge(const rclcpp::NodeOptions& options);
-
-    ~RefereeBridge() = default;
-
 private: 
     std::unique_ptr<serial::Serial> serial_port_;
     std::string serial_port_name_;
@@ -75,8 +71,12 @@ private:
     std::unique_ptr<FrameBuffer> header_receive_buffer_;
     
     std::vector<double> game_robot_hp_;
-    std::vector<double> power_heat_data_;
-    std::vector<double> shoot_data_;
+    std::vector<double> power_heat_;
+    std::vector<double> shoot_;
+
+    ext_game_robot_HP_t game_robot_hp_data_;
+    ext_power_heat_data_t power_heat_data_;
+    ext_shoot_data_t shoot_data_;
 
     std::map<uint16_t, std::function<void(uint8_t *, uint16_t)>> cmd_callback_map_;
     void GameRobotHPCallback(uint8_t * data, uint16_t data_length);
