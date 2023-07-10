@@ -6,7 +6,6 @@ namespace helios_control {
         if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
             return hardware_interface::CallbackReturn::ERROR;
         }
-        hardware_info_ = info;
         serial_port_ = std::make_unique<serial::Serial>();
         header_receive_buffer_ = std::make_unique<FrameBuffer>();
         serial_port_name_ = SERIAL_PORT_NAME;
@@ -35,16 +34,30 @@ namespace helios_control {
             RCLCPP_ERROR(logger_, "Unable to initialize port: %s", e.what());
             return hardware_interface::CallbackReturn::ERROR;
         }
+        // Register Callbacks
+        cmd_callback_map_[0x003] = std::bind(&RefereeBridge::GameRobotHPCallback, this, std::placeholders::_1, std::placeholders::_2);
+        cmd_callback_map_[0x202] = std::bind(&RefereeBridge::PowerHeatDataCallback, this, std::placeholders::_1, std::placeholders::_2);
+        cmd_callback_map_[0x203] = std::bind(&RefereeBridge::ShootDataCallback, this, std::placeholders::_1, std::placeholders::_2);
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     std::vector<hardware_interface::StateInterface> RefereeBridge::export_state_interfaces() {
-        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "export_state_interfaces");
-        return std::vector<hardware_interface::StateInterface>();
+        RCLCPP_INFO(logger_, "export_state_interfaces");
+        std::vector<hardware_interface::StateInterface> state_interfaces;
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+           info_.sensors[0].name, "referee_bridge", game_robot_hp_.data()
+        ));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+           info_.sensors[1].name, "referee_bridge", power_heat_data_.data()
+        ));
+        state_interfaces.emplace_back(hardware_interface::StateInterface(
+           info_.sensors[2].name, "referee_bridge", shoot_data_.data()
+        ));
+        return state_interfaces;
     }
 
     std::vector<hardware_interface::CommandInterface> RefereeBridge::export_command_interfaces() {
-        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "export_command_interfaces");
+        RCLCPP_INFO(logger_, "export_command_interfaces");
         return std::vector<hardware_interface::CommandInterface>();
     }
 
@@ -83,7 +96,7 @@ namespace helios_control {
     }
 
     hardware_interface::CallbackReturn RefereeBridge::on_cleanup(const rclcpp_lifecycle::State & previous_state) {
-        RCLCPP_INFO(rclcpp::get_logger("RefereeBridge"), "on_cleanup");
+        RCLCPP_INFO(logger_, "on_cleanup");
         serial_port_.reset();
         header_receive_buffer_.reset();
         if (serial_port_ != nullptr || header_receive_buffer_ != nullptr) {
@@ -95,7 +108,34 @@ namespace helios_control {
 
     hardware_interface::return_type RefereeBridge::read(const rclcpp::Time & , const rclcpp::Duration & )
     {
-
+        if (!serial_port_->isOpen()) {
+            RCLCPP_ERROR(logger_, "Serial port is not open");
+            return hardware_interface::return_type::ERROR;
+        }
+        while (!(serial_port_->read(&header_receive_buffer_->sof, 1) == 1 && header_receive_buffer_->sof == SOF)) {
+            RCLCPP_INFO(logger_, "Waiting for SOF");
+        }
+        try {
+            serial_port_->read((uint8_t *)&header_receive_buffer_->data_length, 6);
+            if (header_receive_buffer_->data_length > 256) {
+                RCLCPP_ERROR(logger_, "Data length is too long");
+                return hardware_interface::return_type::ERROR;
+            }
+            serial_port_->read(header_receive_buffer_->data, header_receive_buffer_->data_length + 2);
+            if (header_receive_buffer_->CheckTail() != 0xa6a7 && !header_receive_buffer_->CheckPackCRC16()) {
+                RCLCPP_ERROR(logger_, "Data CRC check failed");
+                return hardware_interface::return_type::ERROR;
+            }
+        } catch(serial::SerialException& e) {
+            RCLCPP_ERROR(logger_, "Unable to read from port: %s", e.what());
+            return hardware_interface::return_type::ERROR;
+        }
+        auto it = cmd_callback_map_.find(header_receive_buffer_->cmd_id);
+        if (it != cmd_callback_map_.end()) {
+            it->second(header_receive_buffer_->data, header_receive_buffer_->data_length);
+        } else {
+            RCLCPP_ERROR(logger_, "Unknown cmd_id: %d", header_receive_buffer_->cmd_id);
+        }
         return hardware_interface::return_type::OK;
     }
 
@@ -104,5 +144,18 @@ namespace helios_control {
 
         return hardware_interface::return_type::OK;
     }
+
+    void RefereeBridge::GameRobotHPCallback(uint8_t * data, uint16_t data_length) {
+
+    }
+
+    void RefereeBridge::PowerHeatDataCallback(uint8_t * data, uint16_t data_length) {
+
+    }
+
+    void RefereeBridge::ShootDataCallback(uint8_t * data, uint16_t data_length) {
+
+    }
+
 
 } // namespace helios_control

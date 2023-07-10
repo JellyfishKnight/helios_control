@@ -45,7 +45,7 @@ typedef enum
 	ID_robot_hurt_t					                  = 0x2F6,	//伤害状态数据                   *****
 	ID_shoot_data_t					                  = 0x2F7,	//实时射击数据                   *****
 	ID_bullet_remaining_t                     = 0x2F8,	//子弹剩余发射数                 *****            
-  ID_rfid_status_t                          = 0x2F9,	//机器人 RFID 状态               *****
+  	ID_rfid_status_t                          = 0x2F9,	//机器人 RFID 状态               *****
 	ID_dart_client_cmd_t                      = 0x2FA,	//飞镖机器人客户端指令数据
 	ID_super_cap                              = 0x03F5 	//超级电容 
 } CmdID;

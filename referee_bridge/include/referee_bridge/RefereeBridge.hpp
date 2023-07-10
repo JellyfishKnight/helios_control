@@ -18,6 +18,8 @@
 #include <rm_interfaces/msg/shoot_data.hpp>
 
 #include <vector>
+#include <map>
+#include <string>
 
 #define SOF 0xA5
 #define TOF 0xA6
@@ -25,6 +27,7 @@
 #define SERIAL_PORT_NAME "/dev/ttyUSB1"
 #define SERIAL_PORT_BAUDRATE 115200
 #define SERIAL_PORT_TIMEOUT 1000
+
 
 namespace helios_control {
 
@@ -70,7 +73,15 @@ private:
     int serial_port_timeout_;
 
     std::unique_ptr<FrameBuffer> header_receive_buffer_;
-    hardware_interface::HardwareInfo hardware_info_;
+    
+    std::vector<double> game_robot_hp_;
+    std::vector<double> power_heat_data_;
+    std::vector<double> shoot_data_;
+
+    std::map<uint16_t, std::function<void(uint8_t *, uint16_t)>> cmd_callback_map_;
+    void GameRobotHPCallback(uint8_t * data, uint16_t data_length);
+    void PowerHeatDataCallback(uint8_t * data, uint16_t data_length);
+    void ShootDataCallback(uint8_t * data, uint16_t data_length);
 
     rclcpp::Logger logger_ = rclcpp::get_logger("RefereeBridge");
 };
