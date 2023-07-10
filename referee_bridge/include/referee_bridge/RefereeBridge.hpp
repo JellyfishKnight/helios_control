@@ -10,14 +10,21 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "visibility_control.h"
 
-
-
 #include <Referee.h>
 #include <CRC.h>
 
 #include <rm_interfaces/msg/game_robot_hp.hpp>
 #include <rm_interfaces/msg/power_heat_data.hpp>
 #include <rm_interfaces/msg/shoot_data.hpp>
+
+#include <vector>
+
+#define SOF 0xA5
+#define TOF 0xA6
+
+#define SERIAL_PORT_NAME "/dev/ttyUSB1"
+#define SERIAL_PORT_BAUDRATE 115200
+#define SERIAL_PORT_TIMEOUT 1000
 
 namespace helios_control {
 
@@ -26,12 +33,10 @@ public:
     RCLCPP_SHARED_PTR_DEFINITIONS(RefereeBridge);
 
     REFEREE_PUBLIC
-    hardware_interface::CallbackReturn on_init(
-      const hardware_interface::HardwareInfo & info) override;
+    hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
     REFEREE_PUBLIC
-    hardware_interface::CallbackReturn on_configure(
-      const rclcpp_lifecycle::State & previous_state) override;
+    hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
 
     REFEREE_PUBLIC
     std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
@@ -39,21 +44,20 @@ public:
     REFEREE_PUBLIC
     std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-    REFEREE_PUBLIC
-    hardware_interface::CallbackReturn on_activate(
-      const rclcpp_lifecycle::State & previous_state) override;
+    REFEREE_PUBLIC 
+    hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
     REFEREE_PUBLIC
-    hardware_interface::CallbackReturn on_deactivate(
-      const rclcpp_lifecycle::State & previous_state) override;
+    hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
+
+    REFEREE_PUBLIC 
+    hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state) override;
 
     REFEREE_PUBLIC
-    hardware_interface::return_type read(
-      const rclcpp::Time & time, const rclcpp::Duration & period) override;
+    hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
     REFEREE_PUBLIC
-    hardware_interface::return_type write(
-      const rclcpp::Time & time, const rclcpp::Duration & period) override;
+    hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
     RefereeBridge(const rclcpp::NodeOptions& options);
 
@@ -66,10 +70,9 @@ private:
     int serial_port_timeout_;
 
     std::unique_ptr<FrameBuffer> header_receive_buffer_;
+    hardware_interface::HardwareInfo hardware_info_;
 
-    int SOF_ = 0xA5;
-    int TOF_ = 0xA6;
-
+    rclcpp::Logger logger_ = rclcpp::get_logger("RefereeBridge");
 };
 
 } // namespace helios_control
