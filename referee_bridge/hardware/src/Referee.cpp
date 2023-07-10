@@ -1,5 +1,5 @@
-#include "Referee.h"
-#include "CRC.h"
+#include "Referee.hpp"
+#include "CRC.hpp"
 
 #define BLUE 0
 #define RED 1

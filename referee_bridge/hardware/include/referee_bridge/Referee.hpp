@@ -10,7 +10,9 @@
 #define REFEREE_H
 
 #include <stdbool.h>
+#include <cstring>
 #include <string>
+#include <CRC.hpp>
 
 #define LEN_HEADER 					5 		//帧头长
 #define LEN_CMDID 					2	 		//命令码长度
@@ -420,10 +422,9 @@ typedef enum
 	LEN_rfid_status = 4,													//机器人 RFID 状态
 	LEN_dart_client_cmd = 6,											//飞镖机器人客户端指令数据
 	LEN_map_interactive_data = 15,								//客户端小地图交互数据
-	LEN_keyboard_information = 12								  //键盘、鼠标信息
+	LEN_keyboard_information = 12,								  //键盘、鼠标信息
 	LEN_ground_robot_position = 40, 								  //地面机器人位置数据，对哨兵机器人发送，以 1Hz 频率发送
-	LEN_map_sentry = 103,                                             // 选手端小地图接收哨兵数据，频率上限为 1Hz
-	
+	LEN_map_sentry = 103                                             // 选手端小地图接收哨兵数据，频率上限为 1Hz
 } JudgeDataLength;
 
     

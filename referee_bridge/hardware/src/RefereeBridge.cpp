@@ -192,3 +192,7 @@ namespace helios_control {
 
 
 } // namespace helios_control
+
+#include "pluginlib/class_list_macros.hpp"
+
+PLUGINLIB_EXPORT_CLASS(helios_control::RefereeBridge, hardware_interface::SystemInterface)

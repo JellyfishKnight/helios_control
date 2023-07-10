@@ -11,18 +11,18 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
-  DIRECTORY src
+  DIRECTORY hardware/src
 )
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC
-  include/${PROJECT_NAME}
+  hardware/include/${PROJECT_NAME}
 )
 
-rclcpp_components_register_node(${PROJECT_NAME}
-  PLUGIN RefereeBridge
-  EXECUTABLE ${PROJECT_NAME}_node
-)
+pluginlib_export_plugin_description_file(
+  hardware_interface 
+  referee_bridge.xml
+  )
 
 if(BUILD_TESTING) 
   find_package(ament_lint_auto REQUIRED)
@@ -37,5 +37,7 @@ endif()
 
 ament_auto_package(
   INSTALL_TO_SHARE
-  launch
+  bring_up
+  description
+  docs
   )

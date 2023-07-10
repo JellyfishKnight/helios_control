@@ -10,12 +10,8 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "visibility_control.h"
 
-#include <Referee.h>
-#include <CRC.h>
-
-#include <rm_interfaces/msg/game_robot_hp.hpp>
-#include <rm_interfaces/msg/power_heat_data.hpp>
-#include <rm_interfaces/msg/shoot_data.hpp>
+#include "Referee.hpp"
+#include "CRC.hpp"
 
 #include <vector>
 #include <map>
