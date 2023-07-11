@@ -15,6 +15,7 @@ namespace helios_control {
             RCLCPP_ERROR(logger_, "Unable to allocate memory for serial port or frame buffer");
             return hardware_interface::CallbackReturn::ERROR;
         }
+        
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -125,6 +126,7 @@ namespace helios_control {
         return hardware_interface::return_type::OK;
     }
 
+    /// Not Truly Safe. Considering to rewrite.
     std::vector<hardware_interface::StateInterface> RefereeBridge::export_state_interfaces() {
         RCLCPP_INFO(logger_, "export_state_interfaces");
         std::vector<hardware_interface::StateInterface> state_interfaces;
@@ -151,6 +153,8 @@ namespace helios_control {
 
     std::vector<hardware_interface::CommandInterface> RefereeBridge::export_command_interfaces() {
         RCLCPP_INFO(logger_, "export_command_interfaces");
+        std::vector<hardware_interface::CommandInterface> command_interfaces;
+        /*todo*/
         return std::vector<hardware_interface::CommandInterface>();
     }
 
