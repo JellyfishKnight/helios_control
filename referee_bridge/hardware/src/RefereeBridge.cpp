@@ -182,8 +182,7 @@ namespace helios_control {
 
     void RefereeBridge::PowerHeatDataCallback(uint8_t * data, uint16_t data_length) {
         std::memcpy(&power_heat_data_, 
-        (header_receive_buffer_->data + header_receive_buffer_->GetHeaderLength()),
-        LEN_power_heat_data);
+        (header_receive_buffer_->data + header_receive_buffer_->GetHeaderLength()), LEN_power_heat_data);
         power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_volt));
         power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_current));
         power_heat_.emplace_back(static_cast<double>(power_heat_data_.chassis_power));

@@ -34,6 +34,16 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Referee/RobotHurt.msg"
   "msg/Referee/ShootData.msg"
   "msg/Referee/SupplyProjectileAction.msg"
+
+  "msg/AutoAim/Armor.msg"
+  "msg/AutoAim/Armors.msg"
+  "msg/AutoAim/Target.msg"
+  "msg/AutoAim/DebugLight.msg"
+  "msg/AutoAim/DebugLights.msg"
+  "msg/AutoAim/DebugArmor.msg"
+  "msg/AutoAim/DebugArmors.msg"
+
+
   DEPENDENCIES
     std_msgs
     geometry_msgs
