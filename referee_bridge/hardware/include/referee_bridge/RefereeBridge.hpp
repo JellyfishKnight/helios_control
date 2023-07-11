@@ -37,12 +37,6 @@ public:
     REFEREE_PUBLIC
     hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
 
-    REFEREE_PUBLIC
-    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
-
-    REFEREE_PUBLIC
-    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
-
     REFEREE_PUBLIC 
     hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
@@ -58,6 +52,11 @@ public:
     REFEREE_PUBLIC
     hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
+    REFEREE_PUBLIC
+    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+
+    REFEREE_PUBLIC
+    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 private: 
     std::unique_ptr<serial::Serial> serial_port_;
     std::string serial_port_name_;

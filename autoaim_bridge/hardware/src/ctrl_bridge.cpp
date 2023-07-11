@@ -226,9 +226,8 @@
 // }
 namespace helios_control {
     hardware_interface::CallbackReturn AutoAimBridge::on_init(const hardware_interface::HardwareInfo & info) {
-        auto ret = Base::on_init(info);
-        if (ret != hardware_interface::return_type::OK) {
-            return ret;
+        if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
+            return hardware_interface::CallbackReturn::ERROR;
         }
         serial_port_ = std::make_unique<serial::Serial>();
         serial_port_name_ = SERIAL_PORT_NAME;
@@ -238,12 +237,126 @@ namespace helios_control {
             RCLCPP_ERROR(logger_, "Unable to allocate memory for serial port");
             return hardware_interface::CallbackReturn::ERROR;
         }
-
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn AutoAimBridge::on_configure(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(logger_, "on_configure");
+        try {
+            RCLCPP_INFO(logger_, "Openning serial port %s", serial_port_name_.c_str());
+            serial_port_->setPort(serial_port_name_);
+            serial_port_->setBaudrate(serial_port_baudrate_);
+            serial_port_->setFlowcontrol(serial::flowcontrol_none);
+            serial_port_->setParity(serial::parity_none); // default is parity_none
+            serial_port_->setStopbits(serial::stopbits_one);
+            serial_port_->setBytesize(serial::eightbits);
+            serial::Timeout timeout = serial::Timeout::simpleTimeout(serial_port_timeout_);
+            serial_port_->setTimeout(timeout);
+        } catch (serial::IOException& e) {
+            RCLCPP_ERROR(logger_, "Unable to initialize port: %s", e.what());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
 
+    hardware_interface::CallbackReturn AutoAimBridge::on_activate(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(logger_, "on_activate");
+        try {
+            serial_port_->open();
+        } catch(serial::IOException& e) {
+            RCLCPP_ERROR(logger_, "Unable to open port: %s", e.what());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        if (serial_port_->isOpen()) {
+            RCLCPP_INFO(logger_, "Serial Port Activated");
+        } else {
+            RCLCPP_ERROR(logger_, "Serial Port Failed Activating");
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
+    hardware_interface::CallbackReturn AutoAimBridge::on_deactivate(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(logger_, "on_deactivate");
+        try {
+            serial_port_->close();
+        } catch(serial::IOException& e) {
+            RCLCPP_ERROR(logger_, "Unable to close port: %s", e.what());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        if (!serial_port_->isOpen()) {
+            RCLCPP_INFO(logger_, "Serial Port Deactivated");
+        } else {
+            RCLCPP_ERROR(logger_, "Serial Port Failed Deactivating");
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        return hardware_interface::CallbackReturn::SUCCESS;
+
+    }
+
+    hardware_interface::CallbackReturn AutoAimBridge::on_cleanup(const rclcpp_lifecycle::State & previous_state) {
+        RCLCPP_INFO(logger_, "on_cleanup");
+        serial_port_.reset();
+        if (serial_port_ != nullptr) {
+            RCLCPP_ERROR(logger_, "Unable to deallocate memory for serial port");
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
+    hardware_interface::return_type AutoAimBridge::read(const rclcpp::Time & time, const rclcpp::Duration & period) {
+        RCLCPP_INFO(logger_, "Reading from serial port");
+        try {
+            if (!serial_port_->isOpen())
+            {
+                RCLCPP_ERROR(logger_, "serial unopen");
+                return hardware_interface::return_type::ERROR;
+            }
+            // check head start   检查起始 数据帧头
+            while (serial_port_->read(pdata_, 1) != 1 || pdata[0] != 0xa5);
+            if (serial_port_->read(pdata + 1, 15) != 15 || pdata[15] != 0xa6) {
+                return hardware_interface::return_type::ERROR;
+            }
+        } catch (serial::SerialException& e) {
+            RCLCPP_ERROR(logger_, "Unable to read from port: %s", e.what());
+            return hardware_interface::return_type::ERROR;
+        }
+        // todo overflow
+        std::memcpy(&receive_data_buffer_, pdata_ + 1, 14);
+
+        // receive_data_buffer_.yaw_ = *(float*)(pdata + 1);
+        // receive_data_buffer_.pitch_ = *(float*)(pdata + 5);
+        // receive_data_buffer_.bullet_speed_ = *(float*)(pdata + 9);
+        // receive_data_buffer_.target_mode_ = *(uint8_t*)(pdata + 13);
+        // receive_data_buffer_.target_color_ = *(uint8_t*)(pdata + 14); 
+        return hardware_interface::return_type::OK;
+            
+    }
+
+    hardware_interface::return_type AutoAimBridge::write(const rclcpp::Time & time, const rclcpp::Duration & period) {
+        std::memcpy(pdata_ + 1, &send_data_buffer_, 14);
+        try {
+            // header
+            serial_port_->write((uint8_t *)(&SOF_), 1);
+            // cmd
+            uint8_t temp = 0;
+            // RCLCPP_INFO(this->get_logger(), "CMd: %d",send_data_.cmd_);
+            serial_port_->write((uint8_t *)(&send_data_buffer_.yaw_), 4);
+            serial_port_->write((uint8_t *)(&send_data_buffer_.pitch_), 4);
+            serial_port_->write((uint8_t *)(&send_data_buffer_.find_), 1);
+            serial_port_->write((uint8_t *)(&send_data_buffer_.id_), 1);
+            serial_port_->write((uint8_t *)(&send_data_buffer_.cmd_), 1);
+            /// 注意此处有三个blank占位
+            serial_port_->write((uint8_t *)(&temp), 1);
+            serial_port_->write((uint8_t *)(&temp), 1);
+            serial_port_->write((uint8_t *)(&temp), 1);
+            // tail
+            serial_port_->write((uint8_t *)(&TOF_), 1);
+        } catch (serial::SerialException& e) {
+            RCLCPP_ERROR(logger_, "Unable to write to port: %s", e.what());
+            return hardware_interface::return_type::ERROR;
+        }
+        return hardware_interface::return_type::OK;
     }
 
     std::vector<hardware_interface::StateInterface> AutoAimBridge::export_state_interfaces() {
@@ -254,24 +367,5 @@ namespace helios_control {
 
     }
 
-    hardware_interface::CallbackReturn AutoAimBridge::on_activate(const rclcpp_lifecycle::State & previous_state) {
-
-    }
-
-    hardware_interface::CallbackReturn AutoAimBridge::on_deactivate(const rclcpp_lifecycle::State & previous_state) {
-
-    }
-
-    hardware_interface::CallbackReturn AutoAimBridge::on_cleanup(const rclcpp_lifecycle::State & previous_state) {
-
-    }
-
-    hardware_interface::return_type AutoAimBridge::read(const rclcpp::Time & time, const rclcpp::Duration & period) {
-
-    }
-
-    hardware_interface::return_type AutoAimBridge::write(const rclcpp::Time & time, const rclcpp::Duration & period) {
-
-    }
 
 } // namespace helios_control

@@ -18,12 +18,6 @@
 #include "string"
 #include "memory"
 
-#define __packed __attribute__((packed))
-
-#define SERIAL_PORT_NAME "/dev/ttyUSB0"
-#define SERIAL_PORT_BAUD 115200
-#define SERIAL_PORT_TIMEOUT 1000
-
 /*--------------------------------暂定协议-------------------------------------*/
 
 /**---------------------------------------SEND DATA PROTOCOL--------------------------------------------**/
@@ -54,74 +48,81 @@ BYTE   |   1    |     4      |      4      |     4     |      1       |       1 
  * targetMode: the mode of vision task(AUTOSHOOT/ENERGY)
  * targetColor: blue or red enemy
  */
+#define __packed __attribute__((packed))
+
+#define SERIAL_PORT_NAME "/dev/ttyUSB0"
+#define SERIAL_PORT_BAUDRATE 115200
+#define SERIAL_PORT_TIMEOUT 1000
+
 namespace helios_control {
-typedef enum {AUTOAIM, ENERGY, INIT} NodeType;
 
-typedef struct __packed {
-    /*   head   */
-    uint8_t SOF = 0xA5;
-    /*   data   */
-    float yaw_ = 0;
-    float pitch_ = 0;
-    int id_ = 0;
-    uint8_t find_ = 0;
-    uint8_t cmd_ = 0; // 1 shoot
-    /*   tail   */
-    uint8_t TOF = 0xA6;
-} SendData;
+    typedef enum {AUTOAIM, ENERGY, INIT} NodeType;
 
-typedef struct __packed {    
-    /*   head   */
-    uint8_t SOF;
-    /*   data   */
-    float yaw_;             // 云台的yaw
-    float pitch_;           // 云台的pitch
-    float bullet_speed_;          // 子弹的射速
-    uint8_t target_mode_;         // 发射模式(装甲板自瞄模式 或者 能量机关模式)
-                                 // 0 是自瞄 1 是小能量机关 2 是大能量机关 但是目前1，2没有区别
-    uint8_t target_color_;        // 目标颜色 0为红色，1为蓝色   
-    /*   tail   */
-    uint8_t TOF;
-} ReceiveData;
+    typedef struct __packed {
+        float yaw_ = 0;
+        float pitch_ = 0;
+        int id_ = 0;
+        uint8_t find_ = 0;
+        uint8_t cmd_ = 0; // 1 shoot
+    } SendData;
 
-class AutoAimBridge : public hardware_interfaces::SystemInterface {
-public: 
-    RCLCPP_SHARED_PTR_DEFINITIONS(AutoAimBridge);
+    typedef struct __packed {    
+        float yaw_;             // 云台的yaw
+        float pitch_;           // 云台的pitch
+        float bullet_speed_;          // 子弹的射速
+        uint8_t target_mode_;         // 发射模式(装甲板自瞄模式 或者 能量机关模式)
+                                    // 0 是自瞄 1 是小能量机关 2 是大能量机关 但是目前1，2没有区别
+        uint8_t target_color_;        // 目标颜色 0为红色，1为蓝色   
+    } ReceiveData;
 
-    AUTOAIM_BRIDGE_PUBLIC
-    hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
+    class AutoAimBridge : public hardware_interface::SystemInterface {
+    public: 
+        RCLCPP_SHARED_PTR_DEFINITIONS(AutoAimBridge);
 
-    AUTOAIM_BRIDGE_PUBLIC
-    hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
+        AUTOAIM_BRIDGE_PUBLIC
+        hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
-    AUTOAIM_BRIDGE_PUBLIC
-    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+        AUTOAIM_BRIDGE_PUBLIC
+        hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
 
-    AUTOAIM_BRIDGE_PUBLIC
-    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+        AUTOAIM_BRIDGE_PUBLIC 
+        hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
-    AUTOAIM_BRIDGE_PUBLIC 
-    hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
+        AUTOAIM_BRIDGE_PUBLIC
+        hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
 
-    AUTOAIM_BRIDGE_PUBLIC
-    hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
+        AUTOAIM_BRIDGE_PUBLIC 
+        hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state) override;
 
-    AUTOAIM_BRIDGE_PUBLIC 
-    hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state) override;
+        AUTOAIM_BRIDGE_PUBLIC
+        hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
-    AUTOAIM_BRIDGE_PUBLIC
-    hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period) override;
+        AUTOAIM_BRIDGE_PUBLIC
+        hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
-    AUTOAIM_BRIDGE_PUBLIC
-    hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
-private:
-    std::unique_ptr<serial::Serial> serial_port_;
+        AUTOAIM_BRIDGE_PUBLIC
+        std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
-    SendData send_data_buffer_;
-    ReceiveData receive_data_buffer_;
+        AUTOAIM_BRIDGE_PUBLIC
+        std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-    auto logger_ = rclcpp::get_logger("AutoAimBridge");
-};
+    private:
+        std::unique_ptr<serial::Serial> serial_port_;
+
+        SendData send_data_buffer_;
+        ReceiveData receive_data_buffer_;
+
+        std::string serial_port_name_ = SERIAL_PORT_NAME;
+        int serial_port_baudrate_ = SERIAL_PORT_BAUDRATE;
+        int serial_port_timeout_ = SERIAL_PORT_TIMEOUT;
+
+        int SOF_ = 0xA5;
+        int TOF_ = 0xA6;
+
+        uint8_t pdata_[16] = {0x00};
+
+        rclcpp::Logger logger_ = rclcpp::get_logger("AutoAimBridge");
+    };
 }
 
 
