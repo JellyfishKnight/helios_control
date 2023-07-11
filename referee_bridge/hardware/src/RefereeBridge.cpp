@@ -44,12 +44,21 @@ namespace helios_control {
     std::vector<hardware_interface::StateInterface> RefereeBridge::export_state_interfaces() {
         RCLCPP_INFO(logger_, "export_state_interfaces");
         std::vector<hardware_interface::StateInterface> state_interfaces;
+        // export by the order: 
+        // RED1 RED2 RED3 RED4 RED5 RED7 REDO REDB
+        // BLUE1 BLUE2 BLUE3 BLUE4 BLUE5 BLUE7 BLUEO BLUEB
         state_interfaces.emplace_back(hardware_interface::StateInterface(
            info_.sensors[0].name, "referee_bridge", game_robot_hp_.data()
         ));
+        // export by the order:
+        // chassis_volt chassis_current chassis_power chassis_power_buffer
+        // shooter_id1_17mm_cooling_heat shooter_id2_17mm_cooling_heat shooter_id1_42mm_cooling_heat
+        // shooter_id1_17mm_residual_cooling_heat shooter_id2_17mm_residual_cooling_heat shooter_id1_42mm_residual_cooling_heat 
         state_interfaces.emplace_back(hardware_interface::StateInterface(
            info_.sensors[1].name, "referee_bridge", power_heat_.data()
         ));
+        // export by the order:
+        // bullet_speed
         state_interfaces.emplace_back(hardware_interface::StateInterface(
            info_.sensors[2].name, "referee_bridge", shoot_.data()
         ));
