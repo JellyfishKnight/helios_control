@@ -56,7 +56,7 @@ namespace helios_control {
     sock_fd_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (sock_fd_ == -1)
     {
-        ROS_ERROR("Error: Unable to create a CAN socket");
+        RCLCPP_ERROR(logger_, "Error: Unable to create a CAN socket");
         return false;
     }
     char name[16] = {};  // avoid stringop-truncation
@@ -65,7 +65,7 @@ namespace helios_control {
     // Get the index of the network interface
     if (ioctl(sock_fd_, SIOCGIFINDEX, &interface_request_) == -1)
     {
-        ROS_ERROR("Unable to select CAN interface %s: I/O control error", name);
+        RCLCPP_ERROR(logger_, "Unable to select CAN interface %s: I/O control error", name);
         // Invalidate unusable socket
         close();
         return false;
@@ -76,7 +76,7 @@ namespace helios_control {
     int rc = bind(sock_fd_, reinterpret_cast<struct sockaddr*>(&address_), sizeof(address_));
     if (rc == -1)
     {
-        ROS_ERROR("Failed to bind socket to %s network interface", name);
+        RCLCPP_ERROR(logger_, "Failed to bind socket to %s network interface", name);
         close();
         return false;
     }
@@ -106,11 +106,11 @@ namespace helios_control {
     {
     if (!isOpen())
     {
-        ROS_ERROR_THROTTLE(5., "Unable to write: Socket %s not open", interface_request_.ifr_name);
+        RCLCPP_ERROR(logger_, "Unable to write: Socket %s not open", interface_request_.ifr_name);
         return;
     }
     if (::write(sock_fd_, frame, sizeof(can_frame)) == -1)
-        ROS_DEBUG_THROTTLE(5., "Unable to write: The %s tx buffer may be full", interface_request_.ifr_name);
+        RCLCPP_ERROR(logger_, "Unable to write: The %s tx buffer may be full", interface_request_.ifr_name);
     }
 
     static void* socketcan_receiver_thread(void* argv)
@@ -159,12 +159,11 @@ namespace helios_control {
         // See also: https://www.thegeekstuff.com/2012/04/create-threads-in-linux/
         terminate_receiver_thread_ = false;
         int rc = pthread_create(&receiver_thread_id_, nullptr, &socketcan_receiver_thread, this);
-        if (rc != 0)
-        {
-            ROS_ERROR("Unable to start receiver thread");
+        if (rc != 0) {
+            RCLCPP_ERROR(logger_, "Unable to start receiver thread");
             return false;
         }
-        ROS_INFO("Successfully started receiver thread with ID %lu", receiver_thread_id_);
+        RCLCPP_INFO(logger_, "Successfully started receiver thread with ID %lu", receiver_thread_id_);
         sched_param sched{ .sched_priority = thread_priority };
         pthread_setschedparam(receiver_thread_id_, SCHED_FIFO, &sched);
         return true;

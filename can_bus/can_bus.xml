@@ -1,0 +1,9 @@
+<library path="can_bus">
+  <class name="can_bus/CANBus">
+         type="helios_control::CANBus"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+        This class provides an interface to the CAN bus.
+    </description>
+  </class>
+</library>

@@ -19,38 +19,38 @@
  * library cannot have, but the consuming code must have inorder to link.
  */
 
-#ifndef MOTOR3508__VISIBILITY_CONTROL_H_
-#define MOTOR3508__VISIBILITY_CONTROL_H_
+#ifndef CAN_BUS__VISIBILITY_CONTROL_H_
+#define CAN_BUS__VISIBILITY_CONTROL_H_
 
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
 
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
-#define MOTOR3508_EXPORT __attribute__((dllexport))
-#define MOTOR3508_IMPORT __attribute__((dllimport))
+#define CAN_BUS_EXPORT __attribute__((dllexport))
+#define CAN_BUS_IMPORT __attribute__((dllimport))
 #else
-#define MOTOR3508_EXPORT __declspec(dllexport)
-#define MOTOR3508_IMPORT __declspec(dllimport)
+#define CAN_BUS_EXPORT __declspec(dllexport)
+#define CAN_BUS_IMPORT __declspec(dllimport)
 #endif
-#ifdef MOTOR3508_BUILDING_DLL
-#define MOTOR3508_PUBLIC MOTOR3508_EXPORT
+#ifdef CAN_BUS_BUILDING_DLL
+#define CAN_BUS_PUBLIC CAN_BUS_EXPORT
 #else
-#define MOTOR3508_PUBLIC MOTOR3508_IMPORT
+#define CAN_BUS_PUBLIC CAN_BUS_IMPORT
 #endif
-#define MOTOR3508_PUBLIC_TYPE MOTOR3508_PUBLIC
-#define MOTOR3508_LOCAL
+#define CAN_BUS_PUBLIC_TYPE CAN_BUS_PUBLIC
+#define CAN_BUS_LOCAL
 #else
-#define MOTOR3508_EXPORT __attribute__((visibility("default")))
-#define MOTOR3508_IMPORT
+#define CAN_BUS_EXPORT __attribute__((visibility("default")))
+#define CAN_BUS_IMPORT
 #if __GNUC__ >= 4
-#define MOTOR3508_PUBLIC __attribute__((visibility("default")))
-#define MOTOR3508_LOCAL __attribute__((visibility("hidden")))
+#define CAN_BUS_PUBLIC __attribute__((visibility("default")))
+#define CAN_BUS_LOCAL __attribute__((visibility("hidden")))
 #else
-#define MOTOR3508_PUBLIC
-#define MOTOR3508_LOCAL
+#define CAN_BUS_PUBLIC
+#define CAN_BUS_LOCAL
 #endif
-#define MOTOR3508_PUBLIC_TYPE
+#define CAN_BUS_PUBLIC_TYPE
 #endif
 
-#endif  // MOTOR3508__VISIBILITY_CONTROL_H_
+#endif  // CAN_BUS__VISIBILITY_CONTROL_H_

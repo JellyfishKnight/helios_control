@@ -47,6 +47,7 @@
 
 
 namespace helios_control {
+
     class SocketCAN {
     public:
         SocketCAN() = default;
@@ -97,6 +98,6 @@ namespace helios_control {
         pthread_t receiver_thread_id_{};
 
         rclcpp::Logger logger_ = rclcpp::get_logger("SocketCAN");
-    }
+    };
 
 } // namespace helios_control
