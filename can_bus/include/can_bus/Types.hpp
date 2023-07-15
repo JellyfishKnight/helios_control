@@ -2,8 +2,8 @@
 #define CAN_BUS_TYPES_HPP_
 
 #include <string>
-#include <math_utilities/lp_filter.hpp>
-#include <math_utilities/imu_filter_base.hpp>
+#include <math_utilities/LowPassFilter.hpp>
+#include <math_utilities/IMUFilterBase.hpp>
 #include <unordered_map>
 #include <rclcpp/rclcpp.hpp>
 
