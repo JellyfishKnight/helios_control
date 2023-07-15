@@ -6,17 +6,22 @@
 #include <math_utilities/IMUFilterBase.hpp>
 #include <unordered_map>
 #include <rclcpp/rclcpp.hpp>
+#include <can.h>
 
 namespace helios_control
 {
-    struct ActCoeff
-    {
+    struct CanFrameStamp {
+        can_frame frame;
+        rclcpp::Time stamp;
+    };
+
+
+    struct ActCoeff {
         double act2pos, act2vel, act2effort, pos2act, vel2act, effort2act, max_out, act2pos_offset, act2vel_offset,
             act2effort_offset, kp2act, kd2act;  // for MIT Cheetah motor
     };
 
-    struct ActData
-    {
+    struct ActData {
         std::string name;
         std::string type;
         rclcpp::Time stamp;
@@ -35,28 +40,25 @@ namespace helios_control
         math_utilities::LowPassFilter* lp_filter;
     };
 
-    struct ImuData
-    {
-    rclcpp::Time time_stamp;
-    std::string imu_name;
-    double ori[4];
-    double angular_vel[3], linear_acc[3];
-    double angular_vel_offset[3];
-    double ori_cov[9], angular_vel_cov[9], linear_acc_cov[9];
-    double temperature, angular_vel_coeff, accel_coeff, temp_coeff, temp_offset;
-    bool accel_updated, gyro_updated, camera_trigger;
-    bool enabled_trigger;
-    math_utilities::ImuFilterBase* imu_filter;
+    struct ImuData {
+        rclcpp::Time time_stamp;
+        std::string imu_name;
+        double ori[4];
+        double angular_vel[3], linear_acc[3];
+        double angular_vel_offset[3];
+        double ori_cov[9], angular_vel_cov[9], linear_acc_cov[9];
+        double temperature, angular_vel_coeff, accel_coeff, temp_coeff, temp_offset;
+        bool accel_updated, gyro_updated, camera_trigger;
+        bool enabled_trigger;
+        math_utilities::ImuFilterBase* imu_filter;
     };
 
-    struct TofData
-    {
-    double strength;
-    double distance;
+    struct TofData {
+        double strength;
+        double distance;
     };
 
-    struct CanDataPtr
-    {
+    struct CanDataPtr {
         std::unordered_map<std::string, ActCoeff>* type2act_coeffs_;
         std::unordered_map<int, ActData>* id2act_data_;
         std::unordered_map<int, ImuData>* id2imu_data_;
