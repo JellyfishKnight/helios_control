@@ -13,7 +13,6 @@
   <depend>math_utilities</depend>
   <depend>can_bus</depend>
   <depend>rm_bring_up</depend>
-  <depend>control_core</depend>
   <depend>serial</depend>
   <depend></depend>
   <depend></depend>

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22.0)
-project(can_bus)
+project(gm6020_hw)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,14 +14,19 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   DIRECTORY hardware/src
 )
 
+# Causes the visibility macros to use dllexport rather than dllimport,
+# which is appropriate when building the dll but not consuming it.
+target_compile_definitions(${PROJECT_NAME} PRIVATE "GM6020_BUILDING_DLL")
+
+
 target_include_directories(
   ${PROJECT_NAME} PUBLIC
-  hardware/include/${PROJECT_NAME}
+  hardware/include/
 )
 
 pluginlib_export_plugin_description_file(
   hardware_interface 
-  can_bus.xml
+  gm6020_hw.xml
   )
 
 if(BUILD_TESTING) 
@@ -34,6 +39,13 @@ if(BUILD_TESTING)
   )
   ament_lint_auto_find_test_dependencies()
 endif()
+
+install(TARGETS ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 ament_auto_package(
   INSTALL_TO_SHARE
