@@ -1,14 +1,35 @@
 #include "GM6020Hardware.hpp"
+#include <hardware_interface/actuator_interface.hpp>
+#include <rclcpp/logging.hpp>
+#include <serial/serial.h>
 
 namespace helios_control {
     hardware_interface::CallbackReturn GM6020Hardware::on_init(const hardware_interface::HardwareInfo & info) {
-        if (hardware_interface::SystemInterface::on_init(info) !=hardware_interface::CallbackReturn::SUCCESS) {
+        // init info
+        if (hardware_interface::ActuatorInterface::on_init(info) !=hardware_interface::CallbackReturn::SUCCESS) {
             return hardware_interface::CallbackReturn::ERROR;
         }
+        // resize states and commands
+        hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        // check the number of joints
+        if (info.joints.size() > 4) {
+            RCLCPP_ERROR(logger_, "The number of actuators should be less than 4");
+            return hardware_interface::CallbackReturn::FAILURE;
+        }
+        // create serial
+        serial_ = std::make_shared<serial::Serial>();
+        if (!serial_) {
+            RCLCPP_ERROR(logger_, "Unable to create a serial");
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn GM6020Hardware::on_configure(const rclcpp_lifecycle::State & previous_state) {
-
+        
+        
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn GM6020Hardware::on_activate(const rclcpp_lifecycle::State & previous_state) {

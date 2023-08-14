@@ -11,12 +11,14 @@
 
   <depend>referee_bridge</depend>
   <depend>math_utilities</depend>
-  <depend>can_bus</depend>
   <depend>rm_bring_up</depend>
   <depend>serial</depend>
-  <depend></depend>
-  <depend></depend>
-
+  <depend>actuators_pkg</depend>
+  <depend>gm6020_hw</depend>
+  <depend>armor_autoaim</depend>
+  <depend>rm_interfaces</depend>
+  <depend>bring_up</depend> 
+  
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

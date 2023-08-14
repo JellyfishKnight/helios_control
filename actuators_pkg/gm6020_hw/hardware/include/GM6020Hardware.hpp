@@ -1,3 +1,4 @@
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <serial/serial.h>
 #include "hardware_interface/actuator_interface.hpp"
@@ -50,9 +51,10 @@ class GM6020Hardware : public hardware_interface::ActuatorInterface {
     GM6020_PUBLIC
     hardware_interface::CallbackReturn on_error(const rclcpp_lifecycle::State & previous_state) override;
 private: 
+    std::shared_ptr<serial::Serial> serial_;
 
-    std::vector<double> state_interfaces;
-    std::vector<double> command_interfaces;
+    std::vector<double> hw_states_;
+    std::vector<double> hw_commands_;
 
     rclcpp::Logger logger_ = rclcpp::get_logger("GM6020");
 };
