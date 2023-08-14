@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <serial/serial.h>
@@ -55,6 +56,8 @@ private:
 
     std::vector<double> hw_states_;
     std::vector<double> hw_commands_;
+
+    uint8_t receive_buffer_[256];
 
     rclcpp::Logger logger_ = rclcpp::get_logger("GM6020");
 };

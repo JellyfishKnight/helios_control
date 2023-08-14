@@ -17,6 +17,10 @@ namespace helios_control {
             RCLCPP_ERROR(logger_, "The number of actuators should be less than 4");
             return hardware_interface::CallbackReturn::FAILURE;
         }
+        // check the number of parameters
+        if (info.hardware_parameters.size() != 1) {
+            RCLCPP_ERROR(logger_, "need the name of serial");
+        }
         // create serial
         serial_ = std::make_shared<serial::Serial>();
         if (!serial_) {
@@ -27,8 +31,23 @@ namespace helios_control {
     }
 
     hardware_interface::CallbackReturn GM6020Hardware::on_configure(const rclcpp_lifecycle::State & previous_state) {
-        
-        
+        try {
+        serial_->setPort(info_.hardware_parameters["serial_name"]);
+        serial_->setBaudrate(115200);
+        serial_->setFlowcontrol(serial::flowcontrol_none);
+        serial_->setParity(serial::parity_none); // default is parity_none
+        serial_->setStopbits(serial::stopbits_one);
+        serial_->setBytesize(serial::eightbits);
+        serial::Timeout timeout = serial::Timeout::simpleTimeout(1000);
+        serial_->setTimeout(timeout);
+        } catch (serial::SerialException& e) {
+            RCLCPP_ERROR(logger_, "throwed an exception while declare a serial : %s", e.what());
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        if (!serial_->isOpen()) {
+            RCLCPP_ERROR(logger_, "Unable to open serial");
+            return hardware_interface::CallbackReturn::ERROR;
+        }
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
