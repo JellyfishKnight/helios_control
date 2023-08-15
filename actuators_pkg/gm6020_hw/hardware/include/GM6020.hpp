@@ -28,25 +28,55 @@ typedef struct GM6020State {
     // converter funtion
 }GM6020_State;
 
-inline double* convert_write_buffer_to_states(std::vector<GM6020_State>& states) {
-    static double res[4];
-    // int angle, speed, effort, temperature;
-    // angle = state->angle_high;
-    // angle = angle << 8;
-    // angle = angle | state->angle_low;
-    // res[0] = angle;
-    // speed = state->speed_high;
-    // speed = speed << 8;
-    // speed = speed | state->speed_low;
-    // res[1] = speed;
-    // effort = state->effort_high;
-    // effort = effort << 8;
-    // effort = effort | state->effort_low;
-    // res[2] = effort;
-    // res[3] = temperature;
-    return res;
+inline void convert_read_buffer_to_states(uint8_t *read_buffer, std::vector<GM6020_State>& states) {
+    // get head
+    int sign = read_buffer[0];
+    sign = sign << 8 | read_buffer[1];
+    // actuator 1, 2...
+    if (sign == 0x205) {
+        states[0].angle = read_buffer[2];
+        states[0].angle = (states[0].angle << 8) | read_buffer[3];
+        states[0].angle = read_buffer[4];
+        states[0].angle = (states[0].angle << 8) | read_buffer[5];
+        states[0].angle = read_buffer[2];
+        states[0].angle = (states[0].angle << 8) | read_buffer[7];
+        states[0].temperature = read_buffer[8];
+    } else if (sign == 0x206) {
+        states[1].angle = read_buffer[2];
+        states[1].angle = (states[0].angle << 8) | read_buffer[3];
+        states[1].angle = read_buffer[4];
+        states[1].angle = (states[0].angle << 8) | read_buffer[5];
+        states[1].angle = read_buffer[2];
+        states[1].angle = (states[0].angle << 8) | read_buffer[7];
+        states[1].temperature = read_buffer[8];
+    } else if (sign == 0x207) {
+        states[2].angle = read_buffer[2];
+        states[2].angle = (states[0].angle << 8) | read_buffer[3];
+        states[2].angle = read_buffer[4];
+        states[2].angle = (states[0].angle << 8) | read_buffer[5];
+        states[2].angle = read_buffer[2];
+        states[2].angle = (states[0].angle << 8) | read_buffer[7];
+        states[2].temperature = read_buffer[8];
+    } else if (sign == 0x208) {
+        states[3].angle = read_buffer[2];
+        states[3].angle = (states[0].angle << 8) | read_buffer[3];
+        states[3].angle = read_buffer[4];
+        states[3].angle = (states[0].angle << 8) | read_buffer[5];
+        states[3].angle = read_buffer[2];
+        states[3].angle = (states[0].angle << 8) | read_buffer[7];
+        states[3].temperature = read_buffer[8];
+    }
 }
 
 inline void convert_command_to_write_buffer(GM6020_Cmd& cmd, uint8_t* buffer) {
-    
+    buffer[0] = 0x01;
+    buffer[1] = 0xff;
+    buffer[3] = cmd.actuator_current_1;
+    buffer[2] = cmd.actuator_current_1 >> 8;
+    buffer[5] = cmd.actuator_current_2;
+    buffer[4] = cmd.actuator_current_2 >> 8;
+    buffer[7] = cmd.actuator_current_3;
+    buffer[6] = cmd.actuator_current_3 >> 8;
+    buffer[9] = cmd.actuator_current_4;
+    buffer[8] = cmd.actuator_current_4 >> 8;
 }

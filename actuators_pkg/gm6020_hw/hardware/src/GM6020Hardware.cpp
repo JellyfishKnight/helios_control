@@ -84,6 +84,7 @@ namespace helios_control {
 
     hardware_interface::return_type GM6020Hardware::perform_command_mode_switch(const std::vector<std::string>& start_interfaces,
                                                                 const std::vector<std::string>& stop_interfaces) {
+        
         return hardware_interface::return_type::OK;
     }
 
@@ -93,7 +94,8 @@ namespace helios_control {
     }
 
     hardware_interface::return_type GM6020Hardware::read(const rclcpp::Time & time, const rclcpp::Duration & period) {
-        
+        serial_->read(read_buffer_, 10);
+        convert_read_buffer_to_states(read_buffer_, hw_states_);
         return hardware_interface::return_type::OK; 
     }
 
@@ -149,7 +151,6 @@ namespace helios_control {
     }
 
     hardware_interface::CallbackReturn GM6020Hardware::on_error(const rclcpp_lifecycle::State & previous_state) {
-        
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
