@@ -9,57 +9,22 @@ namespace helios_control {
         if (hardware_interface::ActuatorInterface::on_init(info) !=hardware_interface::CallbackReturn::SUCCESS) {
             return hardware_interface::CallbackReturn::ERROR;
         }
-        // resize states and commands
-        hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-        hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        // resize states
+        hw_states_.resize(info_.joints.size());
         // check the number of joints
         if (info.joints.size() > 4) {
             RCLCPP_ERROR(logger_, "The number of actuators should be less than 4");
-            return hardware_interface::CallbackReturn::FAILURE;
+            return hardware_interface::CallbackReturn::ERROR;
         }
         // check the number of parameters
         if (info.hardware_parameters.size() != 1) {
             RCLCPP_ERROR(logger_, "need the name of serial");
+            return hardware_interface::CallbackReturn::ERROR;
         }
         // create serial
         serial_ = std::make_shared<serial::Serial>();
         if (!serial_) {
             RCLCPP_ERROR(logger_, "Unable to create a serial");
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-        const hardware_interface::ComponentInfo & joint = info_.joints[0];
-        // RRBotModularJoint has exactly one state and command interface on each joint
-        if (joint.command_interfaces.size() != 1)
-        {
-            RCLCPP_FATAL(
-            rclcpp::get_logger("RRBotModularJoint"),
-            "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
-            joint.command_interfaces.size());
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
-        if (joint.command_interfaces[0].name != hardware_interface::HW_IF_POSITION)
-        {
-            RCLCPP_FATAL(
-            rclcpp::get_logger("RRBotModularJoint"),
-            "Joint '%s' have %s command interfaces found. '%s' expected.", joint.name.c_str(),
-            joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
-        if (joint.state_interfaces.size() != 1)
-        {
-            RCLCPP_FATAL(
-            rclcpp::get_logger("RRBotModularJoint"), "Joint '%s' has %zu state interface. 1 expected.",
-            joint.name.c_str(), joint.state_interfaces.size());
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
-        if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION)
-        {
-            RCLCPP_FATAL(
-            rclcpp::get_logger("RRBotModularJoint"), "Joint '%s' have %s state interface. '%s' expected.",
-            joint.name.c_str(), joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
             return hardware_interface::CallbackReturn::ERROR;
         }
         return hardware_interface::CallbackReturn::SUCCESS;
@@ -88,6 +53,18 @@ namespace helios_control {
             RCLCPP_ERROR(logger_, "Unable to open serial");
             return hardware_interface::CallbackReturn::ERROR;
         }
+        // initialize command vector and state vector
+        hw_command_.actuator_current_1 = 0;
+        hw_command_.actuator_current_2 = 0;
+        hw_command_.actuator_current_3 = 0;
+        hw_command_.actuator_current_4 = 0;
+        for (auto &state : hw_states_) {
+            state.angle = 0;
+            state.speed = 0;
+            state.effort = 0;
+            state.temperature = 0;
+        }
+        RCLCPP_INFO(logger_, "Successfully activated!");
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -117,24 +94,63 @@ namespace helios_control {
 
     hardware_interface::return_type GM6020Hardware::read(const rclcpp::Time & time, const rclcpp::Duration & period) {
         
-        return hardware_interface::return_type::OK;
+        return hardware_interface::return_type::OK; 
     }
 
     hardware_interface::return_type GM6020Hardware::write(const rclcpp::Time & time, const rclcpp::Duration & period) {
-        for (auto )
+        // 
+        convert_command_to_write_buffer(hw_command_, write_buffer);
+        try {
+            serial_->write(write_buffer, 10);
+        } catch (serial::SerialException& e) {
+            RCLCPP_FATAL(logger_, "Fail to write commands: %s", e.what());
+            return hardware_interface::return_type::ERROR;
+        }
         return hardware_interface::return_type::OK;
     }
 
     std::vector<hardware_interface::StateInterface> GM6020Hardware::export_state_interfaces() {
-
+        std::vector<hardware_interface::StateInterface> state_interfaces;
+        for (int i = 0; i < hw_states_.size(); i++) {
+            double states[4];
+            states[0] = hw_states_[i].angle;
+            states[1] = hw_states_[i].speed;
+            states[2] = hw_states_[i].effort;
+            states[3] = hw_states_[i].temperature;
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, "angle", &states[0]
+            ));
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, "speed", &states[1]
+            ));
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, "effort", &states[2]
+            ));
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, "temperature", &states[3]
+            ));
+        }
+        return state_interfaces;
     }
 
     std::vector<hardware_interface::CommandInterface> GM6020Hardware::export_command_interfaces() {
-        
+        std::vector<hardware_interface::CommandInterface> command_interfaces;
+        double cmd[4];
+        cmd[0] = hw_command_.actuator_current_1;
+        cmd[1] = hw_command_.actuator_current_2;
+        cmd[2] = hw_command_.actuator_current_3;
+        cmd[3] = hw_command_.actuator_current_4;
+        for (int i = 0; i < 4; i++) {
+            command_interfaces.emplace_back(hardware_interface::CommandInterface(
+                info_.joints[i].name, "current", &cmd[i]
+            ));
+        }
+        return command_interfaces;
     }
 
     hardware_interface::CallbackReturn GM6020Hardware::on_error(const rclcpp_lifecycle::State & previous_state) {
         
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
 }
