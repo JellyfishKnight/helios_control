@@ -10,7 +10,6 @@
 #include "visibility_control.h"
 
 namespace helios_control {
-
 class GM6020Hardware : public hardware_interface::ActuatorInterface {
     RCLCPP_SHARED_PTR_DEFINITIONS(GM6020Hardware);
 
