@@ -4,4 +4,17 @@ controller_manager:
     use_sim_time: false
 
     gm6020:
-      type: 
+      type: gm6020_controller/GM6020Controller
+    
+    joint_state:
+      type: joint_state_broadcaster/JointStateBroadcaster
+  
+gm6020:
+  ros__parameters:
+    publish_rate: 1000.0
+    base_frame_id: base_link
+    
+    motors: ['motor1'] 
+    target_speed: 2 # rad/s
+
+    use_stamped_vel: false

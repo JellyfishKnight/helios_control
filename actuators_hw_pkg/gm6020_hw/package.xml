@@ -14,7 +14,9 @@
   <depend>serial</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp_lifecycle</depend>
+  <depend>math_utilities</depend>
 
+  
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
