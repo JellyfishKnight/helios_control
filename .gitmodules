@@ -1,3 +1,9 @@
 [submodule "armor_autoaim"]
 	path = armor_autoaim
 	url = https://github.com/JellyfishKnight/armor_autoaim.git
+[submodule "actuators_controller_pkg"]
+	path = actuators_controller_pkg
+	url = https://e.coding.net/swjtuhelios/helioscontrol/actuators_controller_pkg.git
+[submodule "actuators_hw_pkg"]
+	path = actuators_hw_pkg
+	url = https://e.coding.net/swjtuhelios/helioscontrol/actuators_hw_pkg.git
