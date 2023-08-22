@@ -43,9 +43,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AutoAim/DebugArmor.msg"
   "msg/AutoAim/DebugArmors.msg"
 
-  "msg/Common/LowPassData.msg"
-  "msg/Common/IMUData.msg"
-
+  "msg/Motor/GM6020Msg.msg"
 
   DEPENDENCIES
     std_msgs

@@ -5,8 +5,9 @@
 #ifndef KALMAN_RMKF_HPP
 #define KALMAN_RMKF_HPP
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 
 namespace math_utilities {
 
