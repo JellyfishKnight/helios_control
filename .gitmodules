@@ -7,3 +7,6 @@
 [submodule "actuators_hw_pkg"]
 	path = actuators_hw_pkg
 	url = https://e.coding.net/swjtuhelios/helioscontrol/actuators_hw_pkg.git
+[submodule "referee_utilities"]
+	path = referee_utilities
+	url = https://e.coding.net/swjtuhelios/helioscontrol/referee_utilities.git
