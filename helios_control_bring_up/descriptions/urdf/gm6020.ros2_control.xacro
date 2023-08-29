@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="gm6020_ros2_control">
-        <ros2_control name="gm6020_hardware_interface" type="actuator">
+        <ros2_control name="gm6020_hw" type="actuator">
             <hardware>
-                <pulgin>gm6020_hw/GM6020Hardware</pulgin>
+                <plugin>gm6020_hw/GM6020Hardware</plugin>
             </hardware>
 
             <joint name="gm6020_1">
