@@ -1,12 +1,6 @@
-[submodule "armor_autoaim"]
-	path = armor_autoaim
-	url = https://github.com/JellyfishKnight/armor_autoaim.git
-[submodule "actuators_controller_pkg"]
-	path = actuators_controller_pkg
-	url = https://e.coding.net/swjtuhelios/helioscontrol/actuators_controller_pkg.git
-[submodule "actuators_hw_pkg"]
-	path = actuators_hw_pkg
-	url = https://e.coding.net/swjtuhelios/helioscontrol/actuators_hw_pkg.git
-[submodule "referee_utilities"]
-	path = referee_utilities
-	url = https://e.coding.net/swjtuhelios/helioscontrol/referee_utilities.git
+[submodule "helios_controllers"]
+	path = helios_controllers
+	url = https://e.coding.net/swjtuhelios/heliosrobotsystem/helios_controllers.git
+[submodule "helios_hw"]
+	path = helios_hw
+	url = https://e.coding.net/swjtuhelios/heliosrobotsystem/helios_hw.git
