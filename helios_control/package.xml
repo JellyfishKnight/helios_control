@@ -16,7 +16,7 @@
   <depend>helios_controllers</depend>
   <depend>helios_hw</depend>
   <depend>armor_autoaim</depend>
-  <depend>rm_interfaces</depend>
+  <depend>helios_rs_interfaces</depend>
   <depend>bring_up</depend> 
   
 
