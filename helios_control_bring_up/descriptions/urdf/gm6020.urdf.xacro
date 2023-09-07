@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gm6020_control">
-    <!-- import description -->
-    <xacro:include filename="$(find helios_control_bring_up)/descriptions/urdf/gm6020.ros2_control.xacro"/>
-    <xacro:gm6020_ros2_control />
-</robot>
