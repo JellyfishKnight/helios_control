@@ -1,0 +1,3 @@
+uint16 bullet_remaining_num_17mm
+uint16 bullet_remaining_num_42mm
+uint16 coin_remaining_num

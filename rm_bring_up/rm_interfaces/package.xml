@@ -1,24 +1,21 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>helios_control</name>
+  <name>rm_interfaces</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="1002984726@qq.com">jk</maintainer>
+  <maintainer email="1002984726@qq.com">wjy</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-
-  <depend>referee_bridge</depend>
-  <depend>math_utilities</depend>
-  <depend>rm_bring_up</depend>
-  <depend>serial</depend>
-  <depend>helios_controllers</depend>
-  <depend>helios_hw</depend>
-  <depend>armor_autoaim</depend>
-  <depend>rm_interfaces</depend>
-  <depend>bring_up</depend> 
   
+  <depend>rosidl_default_generators</depend>
+  <depend>rosidl_default_runtime</depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

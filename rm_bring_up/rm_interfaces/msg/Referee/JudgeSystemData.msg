@@ -1,0 +1,9 @@
+rm_interfaces/GameRobotHP robot_hp
+rm_interfaces/SupplyProjectileAction supply_projectile_action
+rm_interfaces/GameRobotState game_robot_state
+rm_interfaces/PowerHeatData power_heat_data
+rm_interfaces/BuffMusk buff_musk
+rm_interfaces/RobotHurt robot_hurt
+rm_interfaces/ShootData shoot_data
+rm_interfaces/BulletRemaining bullet_remaining
+rm_interfaces/RFIDStatus rfid_status

@@ -1,0 +1,44 @@
+#error: 相机光心到pitch转轴中心的平移
+#coeff: 弹道计算中的阻力系数
+#offset: 固定的偏置
+#react_t: 响应时间
+
+/armor_detector:
+  ros__parameters:
+    debug: true
+    detect_color: 0
+    min_lightness: 113 #day light 113 #night light 120
+    classifier_threshold: 0.9
+
+    light:
+      max_angle: 40.0
+      max_ratio: 0.4
+      min_ratio: 0.05
+
+    armor:
+      max_angle: 35.0
+      max_center_ratio: 1.6
+      min_center_ratio: 0.4
+      min_light_ratio: 0.6
+      max_large_center_distance: 5.0
+      min_large_center_distance: 3.2
+      max_small_center_distance: 3.2
+      min_small_center_distance: 0.8
+
+/armor_predictor:
+  ros__parameters:
+    global_params:
+      show_data: False
+      car_name: 1
+      
+    predictor: 
+      #原为0.05
+      react_t: 0
+      yaw_offset: -0.5
+      pitch_offset: 0
+      average_v_bullet: 15.5
+      coeff: 0.025
+      # infantry : 10 30 #hero 10 16
+      bullet_min_v: 10
+      bullet_max_v: 30
+    
