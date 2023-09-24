@@ -15,8 +15,9 @@ public:
 
     bool set_pid_params(double kp, double ki, double kd, double i_max);
 
-    double pid_control(double error);
+    double pid_control(double set_value, double actual_value);
 
+    double get_res_();
 private:
     double kp_;
     double ki_;

@@ -22,8 +22,8 @@ bool PID::set_pid_params(double kp, double ki, double kd, double i_max) {
     return true;
 }
 
-double PID::pid_control(double error) {
-    current_error_ = error;
+double PID::pid_control(double set_value, double actual_value) {
+    current_error_ = set_value - actual_value;
     error_before_last_error_ += current_error_;
 
     if (error_before_last_error_ > i_max_)  error_before_last_error_ = i_max_;
@@ -36,4 +36,7 @@ double PID::pid_control(double error) {
     return res_;
 }
 
+double PID::get_res_() {
+    return res_;
+}
 } // namespace math_utilities
