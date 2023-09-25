@@ -2,38 +2,37 @@
 // Submodule of HeliosRobotSystem
 // for more see document: https://swjtuhelios.feishu.cn/docx/MfCsdfRxkoYk3oxWaazcfUpTnih?from=from_copylink
 #include "OmnidirectionalSolver.hpp"
+#include <Eigen/src/Core/Matrix.h>
 #include <cmath>
 #include <math.h>
 
 namespace math_utilities {
 
 void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stamped) {
-    // 底盘坐标系如下： 
-    /*               battery
-     *                  |+x  
-     *              //  |  \\
-     *            +y---------
-     *              \\  |  //
-     * 我们通过计算速度向量v(x, y)与单位向量(1, 0)的夹角来分解每个轮子上的速度
+    // 底盘坐标系如下：                           虚拟底盘:
+    /*               battery                         ---+y    battery
+     *                  |+x                           |  
+     *              //  |  \\                  |______|______|+x
+     *            +y---------                  |      |      |
+     *              \\  |  //                         |
+     *                                               ---
+     * 我们先计算虚拟底盘上的运动，再将其转换到实际底盘上，转换仅仅是一个固定theta角的旋转
+     * 假设轮子自身顺时针转动为正，逆时针转动为负
      */
     // linear velocity
     double v_lx = twist_stamped.twist.linear.x;
     double v_ly = twist_stamped.twist.linear.y;
     // angular velocity
-    double v_az = twist_stamped.twist.angular.z;
-    // get cos theta of velocity vector and (1, 0)
-    double cos_theta = (v_lx  * 1 + v_ly * 0) / std::sqrt(v_lx * v_lx + v_ly * v_ly);
-    // get angle
-    double theta = std::acos(cos_theta);
-    // because cos is even function, we need to specify the sign of theta
-    if (v_ly < 0) {
-        theta = -theta;
-    }
-    // get the velocity of each wheel
-    front_left_v_ = v_lx * std::cos(theta + M_PI / 4) + v_ly * std::sin(theta + M_PI / 4) + v_az;
-    front_right_v_ = v_lx * std::cos(theta - M_PI / 4) + v_ly * std::sin(theta - M_PI / 4) - v_az;
-    back_left_v_ = v_lx * std::cos(theta - M_PI / 4) + v_ly * std::sin(theta - M_PI / 4) + v_az;
-    back_right_v_ = v_lx * std::cos(theta + M_PI / 4) + v_ly * std::sin(theta + M_PI / 4) - v_az;
+    // z指向方向视角，顺时针为正，逆时针为负
+    double v_z = twist_stamped.twist.angular.z;
+    Eigen::Vector2d v_l(v_lx, v_ly);
+    Eigen::Matrix2d R;
+    R << cos(M_PI_4), -sin(M_PI_4), sin(M_PI_4), cos(M_PI_4);
+    Eigen::Vector2d v_r = R * v_l;
+    front_left_v_ = -v_r(0) - v_z;
+    front_right_v_ = v_r(1) - v_z;
+    back_left_v_ = -v_r(1) - v_z;
+    back_right_v_ = v_r(0) - v_z;
 }
 
 void OmnidirectionalSolver::get_target_values(

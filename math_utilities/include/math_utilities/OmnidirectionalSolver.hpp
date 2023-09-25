@@ -4,6 +4,8 @@
 #pragma once
 
 #include "geometry_msgs/msg/twist_stamped.hpp"
+#include <Eigen/Core>
+#include <Eigen/Dense>
 
 namespace math_utilities {
 

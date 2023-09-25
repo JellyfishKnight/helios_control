@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ament_cmake_auto REQUIRED)
-
+find_package(Eigen3 REQUIRED)
 ament_auto_find_build_dependencies()
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
@@ -17,6 +17,11 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 target_include_directories(
   ${PROJECT_NAME} PUBLIC
   include/${PROJECT_NAME}
+)
+
+target_link_libraries(
+  ${PROJECT_NAME}
+  Eigen3::Eigen
 )
 
 if(BUILD_TESTING) 
