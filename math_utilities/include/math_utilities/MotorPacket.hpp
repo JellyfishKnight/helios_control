@@ -39,7 +39,7 @@ public:
      * 
      * @param state_interfaces 
      */
-    void get_moto_measure(std::vector<hardware_interface::StateInterface> state_interfaces);
+    void get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces);
     /**
      * @brief Set the pid pos object
      * 

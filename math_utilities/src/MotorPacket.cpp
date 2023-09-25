@@ -12,7 +12,7 @@ MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle,
     pid_current_(pid_current) {}
 
 
-void MotorPacket::get_moto_measure(std::vector<hardware_interface::StateInterface> state_interfaces) {
+void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces) {
     // translate state_interfaces
     // we don't need temperature so we dropped it
     int temp_can_id, temp_motor_type, temp_motor_id;
