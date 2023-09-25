@@ -91,4 +91,14 @@ double MotorPacket::set_motor_speed(int rpm) {
     return pid_vel_.get_res_();
 }
 
+void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {
+    motor_state.can_id = can_id_;
+    motor_state.motor_type = motor_type_;
+    motor_state.motor_number = motor_id_;
+    motor_state.position = angle_;
+    motor_state.velocity = real_current_;
+    motor_state.current = given_current_;
+    motor_state.temperature = temperature_;
+}
+
 } // namespace math_utilities

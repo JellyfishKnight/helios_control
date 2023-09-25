@@ -5,9 +5,11 @@
 #pragma once
 
 #include "controller_interface/controller_interface.hpp"
+#include "helios_rs_interfaces/msg/motor_state.hpp"
 #include "PID.hpp"
 
 #include <cstdint>
+#include <helios_rs_interfaces/msg/detail/motor_state__struct.hpp>
 #include <stdint.h>
 #include <string>
 #include <sys/types.h>
@@ -98,6 +100,12 @@ public:
      * @return double 
      */
     double set_motor_speed(int rpm);
+    /**
+     * @brief Set the state msg object
+     * 
+     * @param motor_state 
+     */
+    void set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state);
 
     std::string motor_name_;
     uint8_t can_id_;
@@ -106,10 +114,10 @@ public:
     double value_;
 private:  
     uint8_t temperature_;
-    int16_t	speed_rpm_;
     int16_t real_current_;
     int16_t given_current_;
     uint16_t angle_;				//abs angle range:[0,8191]
+    int16_t	speed_rpm_;
     uint16_t last_angle_;			//abs angle range:[0,8191]
     int16_t	mid_angle_;
     int32_t	round_cnt_;
