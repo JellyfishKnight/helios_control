@@ -18,16 +18,8 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
     int temp_can_id, temp_motor_type, temp_motor_id;
     for (int i = 0; i < state_interfaces.size(); i++) {
         if (state_interfaces[i].get_prefix_name() == motor_name_) {
-            ///TODO: improve this: the joint name seems has marked each motor specificly
-            //       so we don't need their can_ids, motor_types and so on.
-
-            // if (state_interfaces[i].get_interface_name() == CAN_ID) {
-            //     temp_can_id = static_cast<uint8_t>(state_interfaces[i].get_value());
-            // } else if (state_interfaces[i].get_interface_name() == MOTOR_TYPE) {
-            //     temp_motor_type = static_cast<uint8_t>(state_interfaces[i].get_value());
-            // } else if (state_interfaces[i].get_interface_name() == MOTOR_ID) {
-            //     temp_motor_id = static_cast<uint8_t>(state_interfaces[i].get_value());
-            // }
+            // improve this: the joint name seems has marked each motor specificly
+            // so we don't need their can_ids, motor_types and so on.
             if (state_interfaces[i].get_interface_name() == POSITION) {
                 angle_ = static_cast<uint16_t>(state_interfaces[i].get_value());
             } else if (state_interfaces[i].get_interface_name() == VELOCITY) {
@@ -91,10 +83,14 @@ double MotorPacket::set_motor_speed(int rpm) {
     return pid_vel_.get_res_();
 }
 
+
+double MotorPacket::set_motor_angle(int angle) {
+    ///TODO: set motor angle
+    double res;
+    return res;
+}
+
 void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {
-    motor_state.can_id = can_id_;
-    motor_state.motor_type = motor_type_;
-    motor_state.motor_number = motor_id_;
     motor_state.position = angle_;
     motor_state.velocity = real_current_;
     motor_state.current = given_current_;

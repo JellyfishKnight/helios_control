@@ -2,6 +2,13 @@
 // created by liuhan on 2023/9/25
 // Submodule of HeliosRobotSystem
 // for more see document: https://swjtuhelios.feishu.cn/docx/MfCsdfRxkoYk3oxWaazcfUpTnih?from=from_copylink
+/*
+ * ██   ██ ███████ ██      ██  ██████  ███████
+ * ██   ██ ██      ██      ██ ██    ██ ██
+ * ███████ █████   ██      ██ ██    ██ ███████
+ * ██   ██ ██      ██      ██ ██    ██      ██
+ * ██   ██ ███████ ███████ ██  ██████  ███████
+ */
 #pragma once
 
 #include "controller_interface/controller_interface.hpp"
@@ -9,7 +16,6 @@
 #include "PID.hpp"
 
 #include <cstdint>
-#include <helios_rs_interfaces/msg/detail/motor_state__struct.hpp>
 #include <stdint.h>
 #include <string>
 #include <sys/types.h>
@@ -101,6 +107,13 @@ public:
      */
     double set_motor_speed(int rpm);
     /**
+     * @brief Set the motor angle object
+     * 
+     * @param angle 
+     * @return double 
+     */
+    double set_motor_angle(int angle);
+    /**
      * @brief Set the state msg object
      * 
      * @param motor_state 
@@ -132,9 +145,12 @@ private:
     uint16_t fited_angle_;
     uint32_t msg_cnt_;
     uint32_t can_send_;//最终发送给电机的数据
-    PID pid_current_;//电流环PID
-    PID pid_vel_;//速度环PID
-    PID pid_pos_;//位置环PID
+    //电流环PID
+    PID pid_current_;
+    //速度环PID
+    PID pid_vel_;
+    //位置环PID
+    PID pid_pos_;
     int pid_caculation_cnt_ = 0;
 };
 
