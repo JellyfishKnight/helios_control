@@ -14,6 +14,7 @@
 #include "controller_interface/controller_interface.hpp"
 #include "helios_rs_interfaces/msg/motor_state.hpp"
 #include "PID.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 #include <cstdint>
 #include <stdint.h>
@@ -122,7 +123,7 @@ public:
 
     std::string motor_name_;
     uint8_t can_id_;
-    uint8_t motor_type_;
+    int motor_type_;
     uint8_t motor_id_;
     double value_;
 private:  

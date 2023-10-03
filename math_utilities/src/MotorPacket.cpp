@@ -8,14 +8,36 @@ namespace math_utilities {
 MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle, 
                         PID& pid_pos, PID& pid_vel, PID& pid_current) :
     motor_name_(std::move(motor_name)), mid_angle_(motor_mid_angle), 
-    pid_pos_(pid_pos), pid_vel_(pid_vel),
-    pid_current_(pid_current) {}
+    pid_pos_(pid_pos), pid_vel_(pid_vel), 
+    pid_current_(pid_current) {
+        // init all member
+        angle_ = 0;
+        last_angle_ = 0;
+        total_angle_ = 0;
+        last_total_angle_ = 0;
+        speed_rpm_ = 0;
+        gimbal_angle_ = 0;
+        dif_angle_ = 0;
+        dif_angle_set_ = 0;
+        total_angle_set_ = 0;
+        buf_idx_ = 0;
+        fited_angle_ = 0;
+        msg_cnt_ = 0;
+        can_send_ = 0;
+        round_cnt_ = 0;
+        temperature_ = 0;
+        real_current_ = 0;
+        given_current_ = 0;
+        pid_caculation_cnt_ = 0;
+    }
 
 
 void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces) {
     // translate state_interfaces
     // we don't need temperature so we dropped it
     int temp_can_id, temp_motor_type, temp_motor_id;
+    last_angle_ = angle_;
+    last_total_angle_ = total_angle_;
     for (int i = 0; i < state_interfaces.size(); i++) {
         if (state_interfaces[i].get_prefix_name() == motor_name_) {
             // improve this: the joint name seems has marked each motor specificly
@@ -31,14 +53,13 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
             }
         }
     }
-    last_angle_ = angle_;
-    last_total_angle_ = total_angle_;
     speed_rpm_ = real_current_; //这里是因为两种电调对应位不一样的信息
     if (angle_ - last_angle_ > 4096)
         round_cnt_--;
     else if (angle_ - last_angle_ < -4096)
         round_cnt_++;
     total_angle_ = angle_ - mid_angle_ + round_cnt_ * 8192;
+
     //gimbal_angle代表云台相对初始位置的偏差角
     gimbal_angle_ = angle_ - mid_angle_;
     if (gimbal_angle_ > 8192 / 2) {
