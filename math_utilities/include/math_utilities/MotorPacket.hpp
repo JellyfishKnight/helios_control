@@ -31,9 +31,73 @@
 #define TEMPERATURE "temperature"
 
 namespace math_utilities {
+class UniqueFlag {
+public:
+    uint8_t can_id;
+    int16_t motor_type;
+    uint8_t motor_id;
+
+    bool operator<(const UniqueFlag& flag) const {
+        if (can_id < flag.can_id) {
+            return true;
+        } else if (can_id == flag.can_id) {
+            if (motor_type < flag.motor_type) {
+                return true;
+            } else if (motor_type == flag.motor_type) {
+                if (motor_id < flag.motor_id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool operator==(const UniqueFlag& flag) const {
+        if (can_id == flag.can_id && motor_type == flag.motor_type && motor_id == flag.motor_id) {
+            return true;
+        }
+        return false;
+    }
+
+    bool operator!=(const UniqueFlag& flag) const {
+        if (can_id != flag.can_id || motor_type != flag.motor_type || motor_id != flag.motor_id) {
+            return true;
+        }
+        return false;
+    }
+
+    bool operator>(const UniqueFlag& flag) const {
+        if (can_id > flag.can_id) {
+            return true;
+        } else if (can_id == flag.can_id) {
+            if (motor_type > flag.motor_type) {
+                return true;
+            } else if (motor_type == flag.motor_type) {
+                if (motor_id > flag.motor_id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    UniqueFlag& operator=(const UniqueFlag& flag) {
+        can_id = flag.can_id;
+        motor_type = flag.motor_type;
+        motor_id = flag.motor_id;
+        return *this;
+    }
+
+    UniqueFlag() {
+        can_id = 0;
+        motor_type = 0;
+        motor_id = 0;
+    }
+};
 
 class MotorPacket {
 public:
+    MotorPacket(std::string motor_name);
     /**
     * @brief Construct a new Motor Packet object
     * 
@@ -48,7 +112,7 @@ public:
      * 
      * @param state_interfaces 
      */
-    void get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces);
+    static void get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces, std::map<std::string, MotorPacket>& motor_map);
     /**
      * @brief Set the pid pos object
      * 
@@ -120,6 +184,12 @@ public:
      * @param motor_state 
      */
     void set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state);
+    /**
+     * @brief Get the motor name object
+     * 
+     * @param motor_packet 
+     */
+    void calculate_motor_measure(MotorPacket motor_packet);
 
     std::string motor_name_;
     uint8_t can_id_;
