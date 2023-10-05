@@ -121,9 +121,10 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
         auto iter = unique_map.find(temp_flag);
         if (iter != unique_map.end()) {
             motor_packet.second.calculate_motor_measure(iter->second);
-        } else {
             RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can_id: %d, motor_type: %d, motor_id: %d", temp_flag.can_id, temp_flag.motor_type, temp_flag.motor_id);
-            RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can't find motor state: %s", motor_packet.first.c_str());
+        } else {
+            // RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can_id: %d, motor_type: %d, motor_id: %d", temp_flag.can_id, temp_flag.motor_type, temp_flag.motor_id);
+            // RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can't find motor state: %s", motor_packet.first.c_str());
         }
     }
 }
@@ -155,7 +156,7 @@ double MotorPacket::set_motor_speed(int rpm) {
     // // RCLCPP_INFO(rclcpp::get_logger("resolver"), "round_cnt: %d", round_cnt_);
     // RCLCPP_INFO(rclcpp::get_logger("resolver"), "rpm: %d", rpm);
     // speed circle
-    pid_vel_.pid_control(pid_pos_.get_res_(), total_angle_ - last_total_angle_);
+    pid_vel_.pid_control(rpm, total_angle_ - last_total_angle_);
     // position circle
     if (pid_caculation_cnt_ >= 2) {
         pid_caculation_cnt_ = 0;
