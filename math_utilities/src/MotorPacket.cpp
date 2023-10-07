@@ -156,7 +156,7 @@ double MotorPacket::set_motor_speed(int rpm) {
     // // RCLCPP_INFO(rclcpp::get_logger("resolver"), "round_cnt: %d", round_cnt_);
     // RCLCPP_INFO(rclcpp::get_logger("resolver"), "rpm: %d", rpm);
     // speed circle
-    pid_vel_.pid_control(rpm, total_angle_ - last_total_angle_);
+    pid_vel_.pid_control(pid_pos_.get_res_(), total_angle_ - last_total_angle_);
     // position circle
     if (pid_caculation_cnt_ >= 2) {
         pid_caculation_cnt_ = 0;
