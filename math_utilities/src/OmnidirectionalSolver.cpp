@@ -31,8 +31,8 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
     Eigen::Vector2d v_r = R * v_l;
     front_left_v_ = -v_r(0) - v_z;
     front_right_v_ = v_r(1) - v_z;
-    back_left_v_ = v_r(1) - v_z;
-    back_right_v_ = -v_r(0) - v_z;
+    back_left_v_ = -v_r(1) - v_z;
+    back_right_v_ = v_r(0) - v_z;
 }
 
 void OmnidirectionalSolver::get_target_values(
