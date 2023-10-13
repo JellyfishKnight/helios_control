@@ -121,10 +121,10 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
         auto iter = unique_map.find(temp_flag);
         if (iter != unique_map.end()) {
             motor_packet.second.calculate_motor_measure(iter->second);
-            RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can_id: %d, motor_type: %d, motor_id: %d", temp_flag.can_id, temp_flag.motor_type, temp_flag.motor_id);
+            RCLCPP_DEBUG(rclcpp::get_logger("MotorPacket"), "can_id: %d, motor_type: %d, motor_id: %d", temp_flag.can_id, temp_flag.motor_type, temp_flag.motor_id);
         } else {
-            // RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can_id: %d, motor_type: %d, motor_id: %d", temp_flag.can_id, temp_flag.motor_type, temp_flag.motor_id);
-            // RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can't find motor state: %s", motor_packet.first.c_str());
+            // RCLCPP_WARN(rclcpp::get_logger("MotorPacket"), "can_id: %d, motor_type: %d, motor_id: %d", temp_flag.can_id, temp_flag.motor_type, temp_flag.motor_id);
+            // RCLCPP_WARN(rclcpp::get_logger("MotorPacket"), "can't find motor state: %s", motor_packet.first.c_str());
         }
     }
 }
