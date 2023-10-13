@@ -173,9 +173,22 @@ double MotorPacket::set_motor_speed(int rpm) {
 
 
 double MotorPacket::set_motor_angle(int angle) {
-    ///TODO: set motor angle
-    double res;
-    return res;
+    total_angle_set_ = angle;
+    pid_caculation_cnt_++;
+    // speed circle
+    pid_vel_.pid_control(pid_pos_.get_res_(), total_angle_ - last_total_angle_);
+    // position circle
+    if (pid_caculation_cnt_ >= 2) {
+        pid_caculation_cnt_ = 0;
+        pid_pos_.pid_control(total_angle_set_, total_angle_);
+    }
+    // limit pid_vel out in range from -16384 to 16384
+    if (pid_vel_.get_res_() > 16384) {
+        return 16384;
+    } else if (pid_vel_.get_res_() < -16384) {
+        return -16384;
+    }
+    return pid_vel_.get_res_();
 }
 
 void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {
