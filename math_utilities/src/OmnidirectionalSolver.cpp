@@ -8,8 +8,8 @@
 
 namespace math_utilities {
 
-void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stamped) {
-    // 底盘坐标系如下：                           虚拟底盘:
+void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stamped, double yaw_diff) {
+    // 底盘坐标系如下：                           虚拟底盘(和实际底盘相差yaw_diff角度):
     /*               battery                         ---+y    battery
      *                  |+x                           |  
      *              //  |  \\                  |______|______|+x
@@ -27,7 +27,7 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
     double v_z = twist_stamped.twist.angular.z;
     Eigen::Vector2d v_l(v_lx, v_ly);
     Eigen::Matrix2d R;
-    R << cos(M_PI_4), -sin(M_PI_4), sin(M_PI_4), cos(M_PI_4);
+    R << cos(yaw_diff), -sin(yaw_diff), sin(yaw_diff), cos(yaw_diff);
     Eigen::Vector2d v_r = R * v_l;
     front_left_v_ = v_r(0) + v_z;
     front_right_v_ = -v_r(1) + v_z;
