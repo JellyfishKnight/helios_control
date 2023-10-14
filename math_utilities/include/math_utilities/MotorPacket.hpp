@@ -195,15 +195,15 @@ public:
     uint8_t can_id_;
     int motor_type_;
     uint8_t motor_id_;
+    int16_t	mid_angle_;
     double value_;
+    uint16_t angle_;				//abs angle range:[0,8191]
 private:  
     uint8_t temperature_;
     int16_t real_current_;
     int16_t given_current_;
-    uint16_t angle_;				//abs angle range:[0,8191]
     int16_t	speed_rpm_;
     uint16_t last_angle_;			//abs angle range:[0,8191]
-    int16_t	mid_angle_;
     int32_t	round_cnt_;
     int32_t	total_angle_;
     int32_t last_total_angle_;
