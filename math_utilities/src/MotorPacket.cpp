@@ -80,6 +80,7 @@ void MotorPacket::calculate_motor_measure(MotorPacket motor_packet) {
     // tesscan_++;
 }
 
+///TODO: need improve: extra caculation
 void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces, std::map<std::string, MotorPacket>& motor_map) {
     // translate state_interfaces
     std::map<std::string, MotorPacket> temp_map;
@@ -142,10 +143,10 @@ void MotorPacket::set_pid_current(double kp, double ki, double kd, double i_max)
 }
 
 double MotorPacket::set_motor_speed(int rpm) {
-    if (rpm > 4000) {
-        rpm = 4000;
-    } else if (rpm < -4000) {
-        rpm = -4000;
+    if (rpm > 2000) {
+        rpm = 2000;
+    } else if (rpm < -2000) {
+        rpm = -2000;
     }
     dif_angle_set_ = rpm;
     total_angle_set_ += rpm;
@@ -173,7 +174,7 @@ double MotorPacket::set_motor_speed(int rpm) {
 
 
 double MotorPacket::set_motor_angle(int angle) {
-    total_angle_set_ = angle;
+    total_angle_set_ = total_angle_ + angle;
     pid_caculation_cnt_++;
     // speed circle
     pid_vel_.pid_control(pid_pos_.get_res_(), total_angle_ - last_total_angle_);
