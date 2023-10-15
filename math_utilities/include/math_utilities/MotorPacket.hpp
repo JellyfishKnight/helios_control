@@ -169,14 +169,14 @@ public:
      * @param rpm 
      * @return double 
      */
-    double set_motor_speed(int rpm);
+    void set_motor_speed(int rpm);
     /**
      * @brief Set the motor angle object
      * 
      * @param angle 
      * @return double 
      */
-    double set_motor_angle(int angle);
+    void set_motor_angle(int angle);
     /**
      * @brief Set the state msg object
      * 

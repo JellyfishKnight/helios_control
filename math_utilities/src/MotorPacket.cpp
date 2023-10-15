@@ -129,6 +129,16 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
     // total_angle_set_ = total_angle_ + angle;
 }
 
+void MotorPacket::set_motor_speed(int rpm) {
+    dif_angle_set_ = rpm;
+    total_angle_set_ += rpm;
+
+}
+
+void MotorPacket::set_motor_angle(int angle) {
+    total_angle_set_ = total_angle_ + angle;
+}
+
 void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {
     motor_state.full_name = motor_name_;
     motor_state.can_id = can_id_;
@@ -138,6 +148,7 @@ void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_sta
     motor_state.velocity = real_current_;
     motor_state.current = given_current_;
     motor_state.temperature = temperature_;
+    motor_state.total_angle = total_angle_;
 }
 
 } // namespace math_utilities
