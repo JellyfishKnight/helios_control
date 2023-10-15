@@ -17,7 +17,7 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
      *              \\  |  //                         |
      *                                               ---
      * 我们先计算虚拟底盘上的运动，再将其转换到实际底盘上，转换仅仅是一个固定theta角的旋转
-     * 假设轮子自身顺时针转动为正，逆时针转动为负
+     * 假设轮子自身顺时针转动为-，逆时针转动为+
      */
     // linear velocity
     double v_lx = twist_stamped.twist.linear.x;
@@ -29,10 +29,10 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
     Eigen::Matrix2d R;
     R << cos(yaw_diff), -sin(yaw_diff), sin(yaw_diff), cos(yaw_diff);
     Eigen::Vector2d v_r = R * v_l;
-    front_left_v_ = -v_r(0) - v_z;
-    front_right_v_ = v_r(1) - v_z;
-    back_left_v_ = -v_r(1) - v_z;
-    back_right_v_ = v_r(0) - v_z;
+    front_left_v_ = v_r(0) + v_z;
+    front_right_v_ = -v_r(1) + v_z;
+    back_left_v_ = v_r(1) + v_z;
+    back_right_v_ = -v_r(0) + v_z;
 }
 
 void OmnidirectionalSolver::get_target_values(
