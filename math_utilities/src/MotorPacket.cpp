@@ -1,5 +1,4 @@
 #include "MotorPacket.hpp"
-#include "PID.hpp"
 #include <cstdint>
 #include <utility>
 
@@ -24,14 +23,11 @@ MotorPacket::MotorPacket(std::string motor_name) :
     temperature_ = 0;
     real_current_ = 0;
     given_current_ = 0;
-    pid_caculation_cnt_ = 0;
 }
 
-MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle, 
-                        PID& pid_pos, PID& pid_vel, PID& pid_current) :
-    motor_name_(std::move(motor_name)), mid_angle_(motor_mid_angle), 
-    pid_pos_(pid_pos), pid_vel_(pid_vel), 
-    pid_current_(pid_current) {
+MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle) :
+    motor_name_(std::move(motor_name)), mid_angle_(motor_mid_angle)
+{
     // init all member
     angle_ = 0;
     last_angle_ = 0;
@@ -50,7 +46,6 @@ MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle,
     temperature_ = 0;
     real_current_ = 0;
     given_current_ = 0;
-    pid_caculation_cnt_ = 0;
 }
 
 void MotorPacket::calculate_motor_measure(MotorPacket motor_packet) {
@@ -128,68 +123,10 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
             // RCLCPP_FATAL(rclcpp::get_logger("MotorPacket"), "can't find motor state: %s", motor_packet.first.c_str());
         }
     }
-}
+    // total_angle_set_+= rpm;
+    // last_total_angle_ = total_angle_;
 
-void MotorPacket::set_pid_pos(double kp, double ki, double kd, double i_max) {
-    pid_pos_.set_pid_params(kp, ki, kd, i_max);
-}
-
-void MotorPacket::set_pid_vel(double kp, double ki, double kd, double i_max) {
-    pid_vel_.set_pid_params(kp, ki, kd, i_max);
-}
-
-void MotorPacket::set_pid_current(double kp, double ki, double kd, double i_max) {
-    pid_vel_.set_pid_params(kp, ki, kd, i_max);
-}
-
-double MotorPacket::set_motor_speed(int rpm) {
-    if (rpm > 2000) {
-        rpm = 2000;
-    } else if (rpm < -2000) {
-        rpm = -2000;
-    }
-    dif_angle_set_ = rpm;
-    total_angle_set_ += rpm;
-    pid_caculation_cnt_++;
-    // RCLCPP_INFO(rclcpp::get_logger("resolver"), "total_angle_set: %d", total_angle_set_);
-    // RCLCPP_INFO(rclcpp::get_logger("resolver"), "total_angle: %d", total_angle_);
-    // // RCLCPP_INFO(rclcpp::get_logger("resolver"), "diff %d", total_angle_ - total_angle_set_);
-    // // RCLCPP_INFO(rclcpp::get_logger("resolver"), "round_cnt: %d", round_cnt_);
-    // RCLCPP_INFO(rclcpp::get_logger("resolver"), "rpm: %d", rpm);
-    // speed circle
-    pid_vel_.pid_control(pid_pos_.get_res_(), total_angle_ - last_total_angle_);
-    // position circle
-    if (pid_caculation_cnt_ >= 2) {
-        pid_caculation_cnt_ = 0;
-        pid_pos_.pid_control(total_angle_set_, total_angle_);
-    }
-    // limit pid_vel out in range from -16384 to 16384
-    if (pid_vel_.get_res_() > 16384) {
-        return 16384;
-    } else if (pid_vel_.get_res_() < -16384) {
-        return -16384;
-    }
-    return pid_vel_.get_res_();
-}
-
-
-double MotorPacket::set_motor_angle(int angle) {
-    total_angle_set_ = total_angle_ + angle;
-    pid_caculation_cnt_++;
-    // speed circle
-    pid_vel_.pid_control(pid_pos_.get_res_(), total_angle_ - last_total_angle_);
-    // position circle
-    if (pid_caculation_cnt_ >= 2) {
-        pid_caculation_cnt_ = 0;
-        pid_pos_.pid_control(total_angle_set_, total_angle_);
-    }
-    // limit pid_vel out in range from -16384 to 16384
-    if (pid_vel_.get_res_() > 16384) {
-        return 16384;
-    } else if (pid_vel_.get_res_() < -16384) {
-        return -16384;
-    }
-    return pid_vel_.get_res_();
+    // total_angle_set_ = total_angle_ + angle;
 }
 
 void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {

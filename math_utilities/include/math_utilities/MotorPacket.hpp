@@ -13,7 +13,6 @@
 
 #include "controller_interface/controller_interface.hpp"
 #include "helios_rs_interfaces/msg/motor_state.hpp"
-#include "PID.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <cstdint>
@@ -105,7 +104,7 @@ public:
     * @param pid_vel 
     * @param pid_current 
     */
-    MotorPacket(std::string motor_name, int motor_mid_angle, PID& pid_pos, PID& pid_vel, PID& pid_current);
+    MotorPacket(std::string motor_name, int motor_mid_angle);
 
     /**
      * @brief Get the moto measure object
@@ -196,6 +195,7 @@ public:
     int motor_type_;
     uint8_t motor_id_;
     int16_t	mid_angle_;
+    uint8_t motor_mode_;
     double value_;
     uint16_t angle_;				//abs angle range:[0,8191]
 private:  
@@ -216,13 +216,6 @@ private:
     uint16_t fited_angle_;
     uint32_t msg_cnt_;
     uint32_t can_send_;//最终发送给电机的数据
-    //电流环PID
-    PID pid_current_;
-    //速度环PID
-    PID pid_vel_;
-    //位置环PID
-    PID pid_pos_;
-    int pid_caculation_cnt_ = 0;
 };
 
 
