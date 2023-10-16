@@ -5,6 +5,8 @@
 #include <Eigen/src/Core/Matrix.h>
 #include <cmath>
 #include <math.h>
+#include <rclcpp/logger.hpp>
+#include <rclcpp/logging.hpp>
 
 namespace math_utilities {
 
@@ -28,6 +30,7 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
     Eigen::Vector2d v_l(v_lx, v_ly);
     Eigen::Matrix2d R;
     R << cos(yaw_diff), -sin(yaw_diff), sin(yaw_diff), cos(yaw_diff);
+    // RCLCPP_INFO(rclcpp::get_logger("test"), "\n%f  %f\n%f  %f", R(0), R(1), R(2), R(3));
     Eigen::Vector2d v_r = R * v_l;
     front_left_v_ = v_r(0) + v_z;
     front_right_v_ = -v_r(1) + v_z;

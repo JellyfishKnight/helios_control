@@ -135,8 +135,9 @@ void MotorPacket::set_motor_speed(int rpm) {
 }
 
 
-void MotorPacket::set_motor_angle(int angle) {
-    total_angle_set_ = total_angle_ + angle;
+void MotorPacket::set_motor_angle(int angle, float total_yaw) {
+    total_angle_set_ = total_angle_ + angle + total_yaw / 360.0 * 8192;
+    value_ = total_angle_set_;
 }
 
 void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {
