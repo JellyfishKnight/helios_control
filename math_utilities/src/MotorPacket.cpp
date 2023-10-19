@@ -125,10 +125,6 @@ void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateIn
             // RCLCPP_WARN(rclcpp::get_logger("MotorPacket"), "can't find motor state: %s", motor_packet.first.c_str());
         }
     }
-    // total_angle_set_+= rpm;
-    // last_total_angle_ = total_angle_;
-
-    // total_angle_set_ = total_angle_ + angle;
 }
 
 void MotorPacket::set_motor_speed(int rpm) {
@@ -138,7 +134,7 @@ void MotorPacket::set_motor_speed(int rpm) {
 
 
 void MotorPacket::set_motor_angle(int angle, float total_yaw, float chassis_rotate_speed) {
-    total_angle_set_ = total_angle_ + angle + total_yaw / 360.0 * 8192 * 1.5 + chassis_rotate_speed * 3.5;
+    total_angle_set_ = total_angle_ + angle + total_yaw / 360.0 * 8192 * 1.5 + chassis_rotate_speed * 8;
     value_ = total_angle_set_;
 }
 

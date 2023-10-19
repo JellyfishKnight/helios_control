@@ -176,7 +176,7 @@ public:
      * @param angle 
      * @return double 
      */
-    void set_motor_angle(int angle, float total_yaw, float chassis_rotate_speed);
+    void set_motor_angle(int angle, float total_yaw = 0, float chassis_rotate_speed = 0);
     /**
      * @brief Set the state msg object
      * 
