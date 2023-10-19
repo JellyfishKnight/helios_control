@@ -198,7 +198,6 @@ public:
     uint8_t motor_mode_;
     double value_;
     uint16_t angle_;				//abs angle range:[0,8191]
-private:  
     uint8_t temperature_;
     int16_t real_current_;
     int16_t given_current_;
