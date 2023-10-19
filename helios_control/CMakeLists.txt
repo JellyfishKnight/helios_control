@@ -1,5 +1,9 @@
-cmake_minimum_required(VERSION 3.8)
-project(helios_control)
+cmake_minimum_required(VERSION 3.22.0)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project(helios_control LANGUAGE C CXX)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
