@@ -19,7 +19,7 @@ public:
      * @param twist_stamped navg's comman
      * @param yaw_diff yaw diff of gimbal and chassis
      */
-    void solve(geometry_msgs::msg::TwistStamped &twist_stamped);
+    void solve(geometry_msgs::msg::TwistStamped &twist_stamped, double yaw_diff);
 
     void get_target_values(double& front_left, double& front_right, double& back_left, double& back_right);
 

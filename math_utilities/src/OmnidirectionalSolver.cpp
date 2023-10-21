@@ -10,15 +10,14 @@
 
 namespace math_utilities {
 
-void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stamped) {
-    // 底盘坐标系如下：                           虚拟底盘(和实际底盘相差yaw_diff角度):
-    /*               battery                         ---+y    battery
-     *                  |+x                           |  
-     *              //  |  \\                  |______|______|+x
-     *            +y---------                  |      |      |
-     *              \\  |  //                         |
-     *                                               ---
-     * 我们先计算虚拟底盘上的运动，再将其转换到实际底盘上，转换仅仅是一个固定theta角的旋转
+void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stamped, double yaw_diff) {
+    // 底盘坐标系如下：     
+    /*               battery            
+     *                  |+x              
+     *              //  |  \\              
+     *            +y---------              
+     *              \\  |  //             
+     *                                     
      * 假设轮子自身顺时针转动为-，逆时针转动为+
      */
     // linear velocity
@@ -28,22 +27,22 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
     // z指向方向视角，顺时针为正，逆时针为负
     double v_z = twist_stamped.twist.angular.z;
     Eigen::Vector2d v_l(v_lx, v_ly);
-    // Eigen::Matrix2d R1;
-    // R1 << cos(M_PI_4), -sin(M_PI_4), sin(M_PI_4), cos(M_PI_4);
-    // // RCLCPP_INFO(rclcpp::get_logger("test"), "\n%f  %f\n%f  %f", R(0), R(1), R(2), R(3));
-    // // 旋转到虚拟底盘上
-    // Eigen::Vector2d v_r = R1 * v_l;
-    // Eigen::Matrix2d R2;
-    // R2 << cos(yaw_diff), -sin(yaw_diff), sin(yaw_diff), cos(yaw_diff);
-    // v_r = R2 * v_r; // 转换到实际底盘上
-    // front_left_v_ = v_r(0) + v_z;
-    // front_right_v_ = -v_r(1) + v_z;
-    // back_left_v_ = v_r(1) + v_z;
-    // back_right_v_ = -v_r(0) + v_z;
-    front_left_v_ = v_l(0) + v_z;
-    front_right_v_ = -v_l(1) + v_z;
-    back_left_v_ = v_l(1) + v_z;
-    back_right_v_ = -v_l(0) + v_z;
+    Eigen::Matrix2d R;
+    // yaw_diff = M_PI * 3 / 4;
+    yaw_diff = -yaw_diff;
+    // RCLCPP_WARN(rclcpp::get_logger("debug"), "yaw_diff: %f", yaw_diff);
+    // RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "vl: %f, %f", v_lx, v_ly);
+    R << std::cos(yaw_diff), -std::sin(yaw_diff), 
+         std::sin(yaw_diff), std::cos(yaw_diff);
+    Eigen::Vector2d v_r = R * v_l; // 转换到实际底盘上
+    R << std::cos(M_PI_4), -std::sin(M_PI_4), 
+         std::sin(M_PI_4), std::cos(M_PI_4);
+    v_r = R * v_r; // 转换到轮子坐标系上
+    // RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "vr: %f, %f", v_r(0), v_r(1));
+    front_left_v_ = v_r(0) + v_z;
+    front_right_v_ = -v_r(1) + v_z;
+    back_left_v_ = v_r(1) + v_z;
+    back_right_v_ = -v_r(0) + v_z;
 }
 
 void OmnidirectionalSolver::get_target_values(
