@@ -133,8 +133,9 @@ void MotorPacket::set_motor_speed(int rpm) {
 }
 
 
-void MotorPacket::set_motor_angle(int angle, float total_yaw, float chassis_rotate_speed) {
-    total_angle_set_ = total_angle_ + angle + total_yaw / 360.0 * 8192 * 1.5 + chassis_rotate_speed * 8;
+void MotorPacket::set_motor_angle(double angle, float chassis_rotate_speed) {
+    // total_angle_set_ = total_angle_ + angle + total_yaw / 360.0 * 8192 * 1.5 + chassis_rotate_speed * 8;
+    total_angle_set_ = angle + chassis_rotate_speed * 8;
     value_ = total_angle_set_;
 }
 

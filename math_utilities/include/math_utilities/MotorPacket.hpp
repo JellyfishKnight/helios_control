@@ -173,10 +173,10 @@ public:
     /**
      * @brief Set the motor angle object
      * 
-     * @param angle 
+     * @param angle total angle
      * @return double 
      */
-    void set_motor_angle(int angle, float total_yaw = 0, float chassis_rotate_speed = 0);
+    void set_motor_angle(double angle, float chassis_rotate_speed = 0);
     /**
      * @brief Set the state msg object
      * 
