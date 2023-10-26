@@ -190,6 +190,8 @@ public:
      */
     void calculate_motor_measure(MotorPacket motor_packet);
 
+    uint8_t is_inited_ = false;
+    uint8_t init_angle_;
     std::string motor_name_;
     uint8_t can_id_;
     int motor_type_;

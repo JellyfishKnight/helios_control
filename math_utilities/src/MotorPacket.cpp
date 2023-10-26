@@ -48,9 +48,15 @@ MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle) :
     temperature_ = 0;
     real_current_ = 0;
     given_current_ = 0;
+    is_inited_ = false;
+    init_angle_ = 0;
 }
 
 void MotorPacket::calculate_motor_measure(MotorPacket motor_packet) {
+    if (!is_inited_) {
+        init_angle_ = motor_packet.angle_;
+        is_inited_ = true;
+    }
     last_angle_ = angle_;
     last_total_angle_ = total_angle_;
     msg_cnt_++;
