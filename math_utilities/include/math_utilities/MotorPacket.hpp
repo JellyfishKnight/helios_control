@@ -12,7 +12,7 @@
 #pragma once
 
 #include "controller_interface/controller_interface.hpp"
-#include "helios_rs_interfaces/msg/motor_state.hpp"
+#include "helios_control_interfaces/msg/motor_state.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <cstdint>
@@ -182,7 +182,7 @@ public:
      * 
      * @param motor_state 
      */
-    void set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state);
+    void set_state_msg(helios_control_interfaces::msg::MotorState& motor_state);
     /**
      * @brief Get the motor name object
      * 

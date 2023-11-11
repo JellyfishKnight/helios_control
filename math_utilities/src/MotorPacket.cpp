@@ -145,7 +145,7 @@ void MotorPacket::set_motor_angle(double angle, float chassis_rotate_speed) {
     value_ = total_angle_set_;
 }
 
-void MotorPacket::set_state_msg(helios_rs_interfaces::msg::MotorState& motor_state) {
+void MotorPacket::set_state_msg(helios_control_interfaces::msg::MotorState& motor_state) {
     motor_state.full_name = motor_name_;
     motor_state.can_id = can_id_;
     motor_state.motor_type = motor_type_;
