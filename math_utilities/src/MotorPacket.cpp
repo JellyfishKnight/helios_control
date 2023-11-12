@@ -157,4 +157,41 @@ void MotorPacket::set_state_msg(helios_control_interfaces::msg::MotorState& moto
     motor_state.total_angle = total_angle_;
 }
 
+bool MotorPacket::is_blocked(uint16_t max_block_cnt, uint16_t max_current_limit) {
+    if (is_blocked_) 
+        return true;
+    // angle mode
+    if (motor_mode_ == 0x02) {
+        uint32_t angle_diff = value_ > total_angle_ ? value_ - total_angle_ : total_angle_ - value_;
+        if (angle_diff > 10) {
+            block_cnt_++;
+        } else {
+            block_cnt_ = 0;
+        }            
+    // speed mode
+    } else if (motor_mode_ == 0x01) {
+        int32_t speed_diff = value_ > speed_rpm_ ? value_ - speed_rpm_ : speed_rpm_ - value_;
+        if (speed_diff > 50) {
+            block_cnt_++;
+        } else {
+            block_cnt_ = 0;
+        }
+    }
+    if (given_current_ > max_current_limit || block_cnt_ > max_block_cnt) {
+        block_cnt_ = 0;
+        is_blocked_ = true;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void MotorPacket::solve_block_mode(uint32_t clock_wise_angle) {
+    static int32_t wanted_angle = total_angle_ - clock_wise_angle;
+    value_ = wanted_angle;
+    if (total_angle_ - wanted_angle < 10) {
+        is_blocked_ = false;
+    }
+}
+
 } // namespace math_utilities
