@@ -30,15 +30,12 @@ void OmnidirectionalSolver::solve(geometry_msgs::msg::TwistStamped &twist_stampe
     Eigen::Matrix2d R;
     // yaw_diff = M_PI * 3 / 4;
     yaw_diff = -yaw_diff;
-    // RCLCPP_WARN(rclcpp::get_logger("debug"), "yaw_diff: %f", yaw_diff);
-    // RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "vl: %f, %f", v_lx, v_ly);
     R << std::cos(yaw_diff), -std::sin(yaw_diff), 
          std::sin(yaw_diff), std::cos(yaw_diff);
     Eigen::Vector2d v_r = R * v_l; // 转换到实际底盘上
     R << std::cos(M_PI_4), -std::sin(M_PI_4), 
          std::sin(M_PI_4), std::cos(M_PI_4);
     v_r = R * v_r; // 转换到轮子坐标系上
-    // RCLCPP_WARN(rclcpp::get_logger("rclcpp"), "vr: %f, %f", v_r(0), v_r(1));
     front_left_v_ = v_r(0) + v_z;
     front_right_v_ = -v_r(1) + v_z;
     back_left_v_ = v_r(1) + v_z;
