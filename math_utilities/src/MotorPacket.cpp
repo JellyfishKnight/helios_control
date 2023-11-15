@@ -5,30 +5,9 @@
 #include <utility>
 
 namespace math_utilities {
-MotorPacket::MotorPacket(std::string motor_name) : 
-    motor_name_(std::move(motor_name)) {
-    // init all member
-    angle_ = 0;
-    last_angle_ = 0;
-    total_angle_ = 0;
-    last_total_angle_ = 0;
-    speed_rpm_ = 0;
-    gimbal_angle_ = 0;
-    dif_angle_ = 0;
-    dif_angle_set_ = 0;
-    total_angle_set_ = 0;
-    buf_idx_ = 0;
-    fited_angle_ = 0;
-    msg_cnt_ = 0;
-    can_send_ = 0;
-    round_cnt_ = 0;
-    temperature_ = 0;
-    real_current_ = 0;
-    given_current_ = 0;
-}
 
-MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle) :
-    motor_name_(std::move(motor_name)), mid_angle_(motor_mid_angle)
+MotorPacket::MotorPacket(std::string motor_name) :
+    motor_name_(std::move(motor_name))
 {
     // init all member
     angle_ = 0;
@@ -50,6 +29,7 @@ MotorPacket::MotorPacket(std::string motor_name, int motor_mid_angle) :
     given_current_ = 0;
     is_inited_ = false;
     init_angle_ = 0;
+    mid_angle_ = 0;
 }
 
 void MotorPacket::calculate_motor_measure(MotorPacket motor_packet) {

@@ -96,7 +96,6 @@ public:
 
 class MotorPacket {
 public:
-    MotorPacket(std::string motor_name);
     /**
     * @brief Construct a new Motor Packet object
     * 
@@ -104,7 +103,7 @@ public:
     * @param pid_vel 
     * @param pid_current 
     */
-    MotorPacket(std::string motor_name, int motor_mid_angle);
+    MotorPacket(std::string motor_name);
 
     /**
      * @brief Get the moto measure object
@@ -176,7 +175,7 @@ public:
      * @param angle total angle
      * @return double 
      */
-    void set_motor_angle(double angle, float chassis_rotate_speed = 0);
+    [[deprecated("directly use value_")]] void set_motor_angle(double angle, float chassis_rotate_speed = 0);
     /**
      * @brief Set the state msg object
      * 
