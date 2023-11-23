@@ -145,7 +145,7 @@ bool MotorPacket::is_blocked(uint16_t max_block_cnt, uint16_t max_current_limit)
         uint32_t angle_diff = value_ > total_angle_ ? value_ - total_angle_ : total_angle_ - value_;
         if (angle_diff > 10) {
             block_cnt_++;
-        } else {
+        } else {    
             block_cnt_ = 0;
         }            
     // speed mode
