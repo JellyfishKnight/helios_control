@@ -110,7 +110,7 @@ public:
      * 
      * @param state_interfaces 
      */
-    static void get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces, std::map<std::string, MotorPacket>& motor_map);
+    static void get_moto_measure(const std::vector<hardware_interface::LoanedStateInterface>& state_interfaces, std::map<std::string, MotorPacket>& motor_map);
     /**
      * @brief Set the pid pos object
      * 

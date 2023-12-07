@@ -64,7 +64,7 @@ void MotorPacket::calculate_motor_measure(MotorPacket motor_packet) {
 }
 
 ///TODO: need improve: extra caculation
-void MotorPacket::get_moto_measure(std::vector<hardware_interface::LoanedStateInterface>& state_interfaces, std::map<std::string, MotorPacket>& motor_map) {
+void MotorPacket::get_moto_measure(const std::vector<hardware_interface::LoanedStateInterface>& state_interfaces, std::map<std::string, MotorPacket>& motor_map) {
     // translate state_interfaces
     std::map<std::string, MotorPacket> temp_map;
     for (auto& state : state_interfaces) {
