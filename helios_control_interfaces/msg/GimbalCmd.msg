@@ -1,6 +1,6 @@
 std_msgs/Header header
 
-uint8 gimbal_mode # 0: autoaim 1: cruise 2: debug
+uint8 gimbal_mode # 1: autoaim 2: cruise 0: debug
 uint8 debug_mode  # 0: position 1: velocity
 
 float64 cruise_yaw_vel 
