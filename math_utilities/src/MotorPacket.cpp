@@ -167,8 +167,9 @@ bool MotorPacket::is_blocked(uint16_t max_block_cnt, uint16_t max_current_limit)
 }
 
 void MotorPacket::solve_block_mode(uint32_t clock_wise_angle) {
-    static int32_t wanted_angle = total_angle_ - clock_wise_angle;
+    static int32_t wanted_angle = total_angle_ - clock_wise_angle / 2;
     value_ = wanted_angle;
+    motor_mode_ = 0x02;
     if (total_angle_ - wanted_angle < 10) {
         is_blocked_ = false;
     }
