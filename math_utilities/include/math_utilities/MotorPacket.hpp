@@ -189,20 +189,6 @@ public:
      */
     void calculate_motor_measure(MotorPacket motor_packet);
 
-    /**
-     * @brief Get the motor name object
-     * 
-     * @return true 
-     * @return false 
-     */
-    bool is_blocked(uint16_t max_block_cnt, uint16_t max_current_limit);
-
-    /**
-     * @brief Get the motor name object
-     * 
-     */
-    void solve_block_mode(uint32_t clock_wise_angle);
-
     bool is_blocked_{false};
     uint16_t block_cnt_{0};
     uint8_t is_inited_ = false;
