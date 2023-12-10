@@ -24,7 +24,7 @@
 #define CAN_ID "can_id"
 #define MOTOR_TYPE "motor_type"
 #define MOTOR_ID "motor_id"
-#define POSITION "position"
+#define TOTAL_ANGLE "total_angle"
 #define VELOCITY "velocity"
 #define CURRENT "current"
 #define TEMPERATURE "temperature"
@@ -163,20 +163,6 @@ public:
      */
     double caculate_current_pid(double set_value, double real_value);
     /**
-     * @brief Set the motor speed object
-     * 
-     * @param rpm 
-     * @return double 
-     */
-    void set_motor_speed(int rpm);
-    /**
-     * @brief Set the motor angle object
-     * 
-     * @param angle total angle
-     * @return double 
-     */
-    [[deprecated("directly use value_")]] void set_motor_angle(double angle, float chassis_rotate_speed = 0);
-    /**
      * @brief Set the state msg object
      * 
      * @param motor_state 
@@ -189,10 +175,6 @@ public:
      */
     void calculate_motor_measure(MotorPacket motor_packet);
 
-    bool is_blocked_{false};
-    uint16_t block_cnt_{0};
-    uint8_t is_inited_ = false;
-    uint8_t init_angle_;
     std::string motor_name_;
     uint8_t can_id_;
     int motor_type_;
@@ -200,24 +182,12 @@ public:
     int16_t	mid_angle_;
     uint8_t motor_mode_;
     double value_;
-    uint16_t angle_;				//abs angle range:[0,8191]
+    int32_t	round_cnt_;
+    int64_t	total_angle_;
     uint8_t temperature_;
     int16_t real_current_;
     int16_t given_current_;
     int16_t	speed_rpm_;
-    uint16_t last_angle_;			//abs angle range:[0,8191]
-    int32_t	round_cnt_;
-    int32_t	total_angle_;
-    int32_t last_total_angle_;
-    int32_t	dif_angle_;
-    int32_t	dif_angle_set_;
-    int32_t	total_angle_set_;
-    int32_t gimbal_angle_;
-    uint8_t	buf_idx_;
-    // uint16_t	angle_buf[FILTER_BUF_LEN];
-    uint16_t fited_angle_;
-    uint32_t msg_cnt_;
-    uint32_t can_send_;//最终发送给电机的数据
 };
 
 

@@ -11,57 +11,21 @@ MotorPacket::MotorPacket(std::string motor_name) :
     motor_name_(std::move(motor_name))
 {
     // init all member
-    angle_ = 0;
-    last_angle_ = 0;
     total_angle_ = 0;
-    last_total_angle_ = 0;
     speed_rpm_ = 0;
-    gimbal_angle_ = 0;
-    dif_angle_ = 0;
-    dif_angle_set_ = 0;
-    total_angle_set_ = 0;
-    buf_idx_ = 0;
-    fited_angle_ = 0;
-    msg_cnt_ = 0;
-    can_send_ = 0;
     round_cnt_ = 0;
     temperature_ = 0;
     real_current_ = 0;
     given_current_ = 0;
-    is_inited_ = false;
-    init_angle_ = 0;
     mid_angle_ = 0;
 }
 
 void MotorPacket::calculate_motor_measure(MotorPacket motor_packet) {
-    if (!is_inited_) {
-        init_angle_ = motor_packet.angle_;
-        is_inited_ = true;
-    }
-    last_angle_ = angle_;
-    last_total_angle_ = total_angle_;
-    msg_cnt_++;
-    angle_ = motor_packet.angle_;
+    total_angle_ = motor_packet.total_angle_;
     real_current_ = motor_packet.real_current_;
     given_current_ = motor_packet.given_current_;
     temperature_ = motor_packet.temperature_;
     speed_rpm_ = real_current_; //这里是因为两种电调对应位不一样的信息
-    if (angle_ - last_angle_ > 4096)
-        round_cnt_--;
-    else if (angle_ - last_angle_ < -4096)
-        round_cnt_++;
-    total_angle_ = angle_ - mid_angle_ + round_cnt_ * 8192;
-
-    //gimbal_angle代表云台相对初始位置的偏差角
-    gimbal_angle_ = angle_ - mid_angle_;
-    if (gimbal_angle_ > 8192 / 2) {
-        gimbal_angle_ -= 8192;
-    }
-    else if (gimbal_angle_ < -8192 / 2) {
-        gimbal_angle_ += 8192;
-    }
-    dif_angle_ = total_angle_ - last_total_angle_;
-    // tesscan_++;
 }
 
 ///TODO: need improve: extra caculation
@@ -74,8 +38,8 @@ void MotorPacket::get_moto_measure(const std::vector<hardware_interface::LoanedS
             temp_map.emplace(std::pair<std::string, MotorPacket>(state.get_prefix_name(), temp_packet));
         }
         auto packet = temp_map.find(state.get_prefix_name());
-        if (state.get_interface_name() == POSITION) {
-            packet->second.angle_ = static_cast<uint16_t>(state.get_value());
+        if (state.get_interface_name() == TOTAL_ANGLE) {
+            packet->second.total_angle_ = static_cast<int64_t>(state.get_value());
         } else if (state.get_interface_name() == VELOCITY) {
             packet->second.real_current_ = static_cast<int16_t>(state.get_value());
         } else if (state.get_interface_name() == CURRENT) {
@@ -114,24 +78,11 @@ void MotorPacket::get_moto_measure(const std::vector<hardware_interface::LoanedS
     }
 }
 
-void MotorPacket::set_motor_speed(int rpm) {
-    dif_angle_set_ = rpm;
-    total_angle_set_ += rpm;
-}
-
-
-void MotorPacket::set_motor_angle(double angle, float chassis_rotate_speed) {
-    // total_angle_set_ = total_angle_ + angle + total_yaw / 360.0 * 8192 * 1.5 + chassis_rotate_speed * 8;
-    total_angle_set_ = angle + chassis_rotate_speed * 8;
-    value_ = total_angle_set_;
-}
-
 void MotorPacket::set_state_msg(helios_control_interfaces::msg::MotorState& motor_state) {
     motor_state.full_name = motor_name_;
     motor_state.can_id = can_id_;
     motor_state.motor_type = motor_type_;
     motor_state.motor_number = motor_id_;
-    motor_state.position = angle_;
     motor_state.velocity = real_current_;
     motor_state.current = given_current_;
     motor_state.temperature = temperature_;
