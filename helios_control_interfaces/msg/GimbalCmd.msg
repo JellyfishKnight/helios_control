@@ -1,9 +1,6 @@
 std_msgs/Header header
 
-uint8 gimbal_mode # 1: autoaim 2: cruise 0: debug
-uint8 debug_mode  # 0: position 1: velocity
+uint8 gimbal_mode # 0: autoaim 1: cruise 
 
-float64 cruise_yaw_vel 
-float64 cruise_pitch_vel # pitch velocity is absolute value
-float64 yaw
-float64 pitch
+float64 yaw_value     # when in autoaim mode, the angle of yaw and pitch is under imu frame
+float64 pitch_value   # when in cruise mode, pitch velocity is absolute value
